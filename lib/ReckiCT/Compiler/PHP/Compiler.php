@@ -49,6 +49,7 @@ class Compiler extends BaseCompiler
         '>>',
     ];
 
+    protected $compileCache = [];
 
     public function convertToCallable(array $instructions)
     {
