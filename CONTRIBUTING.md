@@ -45,3 +45,5 @@ By default, anyone with an @google.com email address already has a CLA
 signed for them. Congratulations!
 
 We've also received CLAs from the following people:
+
+ * krakjoe [php.net] (Joe Watkins)
