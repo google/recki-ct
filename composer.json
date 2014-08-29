@@ -1,0 +1,58 @@
+{
+    "type": "project",
+    "name": "recki-ct/recki-ct",
+    "description": "A Compiler Toolkit for PHP.",
+    "license": "Apache-2.0",
+    "keywords": ["compile", "compiler", "jit", "ast", "cfg", "ssa"],
+    
+    "homepage": "https://github.com/google/recki-ct",
+
+    "support": {
+        "irc": "irc://irc.freenode.org/reckict"
+    },
+
+    "authors": [
+        {
+            "name": "Anthony Ferrara",
+            "email": "ircmaxell@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    
+    "require": {
+        "php-64bit": ">=5.5.0",
+        "nikic/php-parser": "dev-master",
+        "phpdocumentor/reflection-docblock": "2.0.*",
+        "sdboyer/gliph": "0.6.*"
+    },
+
+    "require-dev": {
+        "phpunit/phpunit": "4.*",
+        "phploc/phploc": "*",
+        "phpdocumentor/graphviz": "1.0.*",
+        "mockery/mockery": "0.9.*",
+        "phake/phake": "2.0.0-beta2"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "ReckiCT\\": "lib/ReckiCT/"
+        }
+    },
+
+    "autoload-dev": {
+        "psr-4": {
+            "ReckiCT\\": [
+                "test/src/Helper/ReckiCT/",
+                "test/src/Mocks/ReckiCT/",
+                "test/Unit/ReckiCT/"
+
+            ],
+            "JITFU\\": "test/src/Stubs/JITFU/"
+        },
+        "files": [
+            "test/src/Stubs/JITFU/constants.php"
+        ]
+    }
+
+}
