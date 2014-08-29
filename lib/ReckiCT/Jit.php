@@ -277,7 +277,7 @@ class Jit
     /**
      * Parse a given file into AST
      *
-     * @param string $fileName the fiulename to parse
+     * @param string $fileName the filename to parse
      *
      * @return \PhpParser\Node[] The parsed AST
      */
