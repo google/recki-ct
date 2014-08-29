@@ -24,7 +24,7 @@ All contributors to Recki-CT must sign a CLA.
 
 A CLA (Contributor License Agreement) basically says that you own the
 rights to any code you contribute, and that you give us permission to
-use that code in Closure Compiler. You maintain the copyright on that
+use that code in Recki-CT. You maintain the copyright on that
 code.
 
 ## Where do I sign up?
