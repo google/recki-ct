@@ -80,3 +80,5 @@ Recki-CT is released under the [Apache-2 License](LICENCE).
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+And join the [Google Group](https://groups.google.com/forum/#!forum/recki-ct) mailing list.
