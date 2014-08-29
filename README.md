@@ -20,6 +20,8 @@
 Recki-CT
 ========
 
+[![Build Status](https://travis-ci.org/google/recki-ct.svg?branch=master)](https://travis-ci.org/google/recki-ct)
+
 The **Recki Compiler Toolkit** for PHP
 
 Disclaimer: This is not an official Google product.
