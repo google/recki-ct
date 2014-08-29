@@ -106,10 +106,6 @@ benchmark($func, "ReckiCT");
 /**
  * A very light weight benchmark tool, which runs the code 100,000 times.
  *
- * For very simple functions like the one we are testing here, we don't expect
- * a lot of gain (if any), since the overhead of the functional call will dominate
- * the runtime.
- *
  * @param callable $func  The function to benchmark
  * @param string   $label The label of the test, for output
  *
