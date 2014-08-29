@@ -47,3 +47,5 @@ signed for them. Congratulations!
 We've also received CLAs from the following people:
 
  * krakjoe [php.net] (Joe Watkins)
+ * dave1010 [gmail.com] (David Hulbert)
+ * andy.huang [terradin.com] (Andy Huang)
