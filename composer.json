@@ -4,7 +4,7 @@
     "description": "A Compiler Toolkit for PHP.",
     "license": "Apache-2.0",
     "keywords": ["compile", "compiler", "jit", "ast", "cfg", "ssa"],
-    
+
     "homepage": "https://github.com/google/recki-ct",
 
     "support": {
@@ -18,7 +18,7 @@
             "role": "Developer"
         }
     ],
-    
+
     "require": {
         "php-64bit": ">=5.5.0",
         "nikic/php-parser": "1.0.*@dev",
