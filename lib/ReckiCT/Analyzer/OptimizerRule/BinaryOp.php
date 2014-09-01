@@ -34,7 +34,7 @@ class BinaryOp implements OptimizerRule
 {
     public function process(Vertex $vertex, DirectedAdjacencyList $graph)
     {
-        if ($vertex->getName() !== 'BinaryOp') { 
+        if ($vertex->getName() !== 'BinaryOp') {
             return false;
         }
         $result = $vertex->getResult();

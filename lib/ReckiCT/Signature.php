@@ -36,7 +36,7 @@ class Signature
     protected $return;
 
     /**
-     * @var \ReckiCT\Type[] The types of each paramter
+     * @var \ReckiCT\Type[] The types of each parameter
      */
     protected $params = [];
 

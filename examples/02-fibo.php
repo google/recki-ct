@@ -63,7 +63,7 @@ benchmark($func, "ReckiCT");
 /**
  * A very light weight benchmark tool, which runs the code 100,000 times.
  *
- * For a function that's as CPU intensive as this, Recki-CT should already 
+ * For a function that's as CPU intensive as this, Recki-CT should already
  * be orders of magnitude faster than PHP.
  *
  * @param callable $func  The function to benchmark

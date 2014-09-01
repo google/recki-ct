@@ -56,7 +56,7 @@ class Value
         return !is_null($this->value);
     }
 
-    public function isParamter()
+    public function isParameter()
     {
         return false;
     }

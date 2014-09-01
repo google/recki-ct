@@ -27,14 +27,14 @@
  */
 
 /**
- * This use satement is a helper to shorten the Jit call. It's completely
+ * This use statement is a helper to shorten the Jit call. It's completely
  * optional, and you could replace the calls down the line with ReckiCT\Jit::
  * if you wanted.
  */
 use ReckiCT\Jit;
 
 /**
- * We must include the composer autoloader, which also boostrap all of the
+ * We must include the composer autoloader, which also bootstrap all of the
  * dependencies for us!!!
  */
 require_once __DIR__ . '/../vendor/autoload.php';

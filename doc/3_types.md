@@ -24,7 +24,7 @@ Recki-CT uses a series of system types to represent variables. These are represe
 
 ## Unknown (`Type::TYPE_UNKNOWN`)
 
-This is the default type. All new variables that aren't parameters are initialized using this type. It also will prevent compliation if present in output IR.
+This is the default type. All new variables that aren't parameters are initialized using this type. It also will prevent compilation if present in output IR.
 
 ## Void (`Type::TYPE_VOID`)
 
@@ -80,7 +80,7 @@ Represents the name of a class.
 
 ## Array (`Type::TYPE_ARRAY`):
 
-Represents a numericly indexed array of something. Always requires a sub-type, which are the types of values.
+Represents a numerically indexed array of something. Always requires a sub-type, which are the types of values.
 
 Note that this is a literal array, not a PHP array. String keys are not supported, nor are sparse arrays.
 
