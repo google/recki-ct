@@ -52,9 +52,9 @@ class GraphPrinter
     }
 
     /**
-     * Generate a image representation of the graph, and save to a faile
+     * Generate a image representation of the graph, and save to a file
      *
-     * @param \Gliph\Graph\DirectedAdjacencyList $graph    The grpah to print
+     * @param \Gliph\Graph\DirectedAdjacencyList $graph    The graph to print
      * @param string                             $filename The filename to save the graph to
      * @param string                             $format   The GraphViz format to render to
      *

@@ -39,7 +39,7 @@ A compiler toolkit is useful for [static analysis](http://en.wikipedia.org/wiki/
     So other projects (such as HHVM and HippyVM) have tried to improve the performance by implementing a JIT (Just-In-Time) compiler. This basically works by compiling loops and frequently run code to native machine code at runtime. For loop heavy code, and code that's mostly static, this can have a significant 
     speed advantage. And benchmarks show that increases for average applications of 30% or more, and increases for certain benchmarks can be over 30 times faster.
 
-    But it still isn't nearly as fast as natively compiled static code. Optimized C code can be 10's of times faster than even a JIT compiler is capibile of.
+    But it still isn't nearly as fast as natively compiled static code. Optimized C code can be 10's of times faster than even a JIT compiler is capable of.
 
     One reason is the cost of complex optimizations like loop unrolling, function inlining and dead code removal. These optimizations can be WAY too expensive to
     execute at runtime for a JIT compiler. But with an AOT (Ahead-of-Time) compiler, they can be pre-computed.
@@ -128,7 +128,7 @@ A compiler toolkit is useful for [static analysis](http://en.wikipedia.org/wiki/
 
     * *Unreachable Code Elimination*
 
-        You can have code that appears after return blocks, or is otherwise unreachable (due to constant ifs, etc). This opimization will eliminate that code.
+        You can have code that appears after return blocks, or is otherwise unreachable (due to constant ifs, etc). This optimization will eliminate that code.
 
             return 1;
             $a = 3;

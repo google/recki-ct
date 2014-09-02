@@ -120,7 +120,6 @@ class Dominator
     public function immediateDominator(Vertex $vertex)
     {
         $candidates = $this->dominator[$vertex];
-        $valid = array();
         foreach ($candidates as $c1) {
             if ($c1 === $vertex) {
                 // A vertex cannot be its own immediate dominator

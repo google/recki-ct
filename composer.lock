@@ -1,9 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
     ],
-    "hash": "b81bd08a6bf1d20f67367d0ad3b6dd70",
+    "hash": "4853e821229e9ff7bc5f8c181a055f8a",
     "packages": [
         {
             "name": "nikic/php-parser",
@@ -1398,18 +1399,15 @@
             "time": "2014-02-19 00:20:43"
         }
     ],
-    "aliases": [
-
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "nikic/php-parser": 20,
         "phake/phake": 10
     },
+    "prefer-stable": false,
     "platform": {
         "php-64bit": ">=5.5.0"
     },
-    "platform-dev": [
-
-    ]
+    "platform-dev": []
 }

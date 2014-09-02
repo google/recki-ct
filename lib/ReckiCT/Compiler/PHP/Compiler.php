@@ -57,7 +57,6 @@ class Compiler extends BaseCompiler
         if (isset($this->compileCache[$func[1]])) {
             return $this->compileCache[$func[1]];
         }
-        $args = [];
         $argNames = [];
         $i = 1;
         
@@ -169,7 +168,7 @@ class Compiler extends BaseCompiler
 
         }
         if (in_array($instruction[0], self::$binaryOps)) {
-            $ctx->function .= $ctx->scope[$instruction[3]] . ' = ' 
+            $ctx->function .= $ctx->scope[$instruction[3]] . ' = '
                 . $ctx->scope[$instruction[1]] . ' ' . $instruction[0] . ' '
                 . $ctx->scope[$instruction[2]] . ";\n";
             return;
