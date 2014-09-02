@@ -74,7 +74,7 @@ class JumpZTest extends TestCase
      * @covers ::getVariables
      * @covers ::replaceVariable
      */
-    public function testReplaceVaraibleValue()
+    public function testReplaceVariableValue()
     {
         $vertex = new JumpZ($this->getMock(Vertex::class), $b = new Variable());
         $this->assertSame([$b], $vertex->getVariables());
@@ -86,7 +86,7 @@ class JumpZTest extends TestCase
      * @covers ::getVariables
      * @covers ::replaceVariable
      */
-    public function testReplaceVaraibleNothing()
+    public function testReplaceVariableNothing()
     {
         $vertex = new JumpZ($this->getMock(Vertex::class), $b = new Variable());
         $this->assertSame([$b], $vertex->getVariables());
