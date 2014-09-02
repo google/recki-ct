@@ -60,7 +60,7 @@ class ReturnTest extends TestCase
      * @covers ::getVariables
      * @covers ::replaceVariable
      */
-    public function testReplaceVaraibleValue()
+    public function testReplaceVariableValue()
     {
         $vertex = new Return_($b = new Variable());
         $this->assertSame([$b], $vertex->getVariables());
@@ -72,7 +72,7 @@ class ReturnTest extends TestCase
      * @covers ::getVariables
      * @covers ::replaceVariable
      */
-    public function testReplaceVaraibleNothing()
+    public function testReplaceVariableNothing()
     {
         $vertex = new Return_($b = new Variable());
         $this->assertSame([$b], $vertex->getVariables());

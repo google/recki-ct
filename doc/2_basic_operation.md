@@ -188,7 +188,7 @@ These include:
 
  * Propagate Constants
 
-    Since variables are only assigned once, assigning a constant to a variable can be optimized out (simply replace all occurances of the variable by the constant).
+    Since variables are only assigned once, assigning a constant to a variable can be optimized out (simply replace all occurrences of the variable by the constant).
 
     There is one catch to this though. If the variable being assigned to is used in a `Phi` function, then we can't optimize it away (yet).
 
@@ -235,7 +235,7 @@ For example:
 
     a_string = phi(b_string, c_string)
 
-Would replace all occurances of `b_string` and `c_string` with `a_string` everywhere in the application.
+Would replace all occurrences of `b_string` and `c_string` with `a_string` everywhere in the application.
 
 Note that this happens only after **all** optimizations are finished. After this step, the CFG is no longer in SSA form, so the assumptions that are made in the optimizer won't hold up anymore.
 
@@ -255,7 +255,7 @@ For example:
         return $a + 1;
     }
 
-Could be represnted as:
+Could be represented as:
 
     function test long
     param $1 long

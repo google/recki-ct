@@ -25,6 +25,7 @@ namespace ReckiCT\Graph\Vertex;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use ReckiCT\Graph\Variable;
+
 /**
  * @coversDefaultClass \ReckiCT\Graph\Vertex\Phi
  */

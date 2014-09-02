@@ -275,7 +275,7 @@ namespace ReckiCT\Mocks {
     /**
      * @param  int[] $a
      * @param  int   $key
-     * @return int   The vaue of $a[$key]
+     * @return int   The value of $a[$key]
      */
     function getAtOffset(array $a, $key)
     {
