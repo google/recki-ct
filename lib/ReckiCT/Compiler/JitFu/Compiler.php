@@ -213,7 +213,7 @@ class Compiler extends BaseCompiler
                 }
                 $this->storeResultVar(
                     $instruction[$n - 1],
-                    $ctx->function->doCall($this->jit->compileFunctionJitFu($name), $args),
+                    $this->resolveFunctionCall($ctx, $name, $args),
                     $ctx
                 );
 
@@ -264,6 +264,10 @@ class Compiler extends BaseCompiler
                 case 'void':
                     $jittype = JitType::of(JitType::void);
             }
+            if (!$jittype && substr($type, -2) === '[]') {
+                $subtype = $this->createType(substr($type, 0, -2));
+                $jittype = new JitType($subtype, true);
+            }
             if (!$jittype) {
                 throw new \RuntimeException('Unknown type encountered: ' . $type);
             }
@@ -271,6 +275,18 @@ class Compiler extends BaseCompiler
         }
 
         return $this->types[$type];
+    }
+
+    public function resolveFunctionCall($ctx, $name, array $args) {
+        switch (strtolower($name)) {
+            case 'strlen':
+            case 'count':
+                if (count($args) !== 1) {
+                    throw new \RuntimeException("Invalid arguments supplied for strlen()");
+                }
+                return $ctx->function->doSize($args[0]);
+        }
+        return $ctx->function->doCall($this->jit->compileFunctionJitFu($name), $args);
     }
 
 }
