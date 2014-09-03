@@ -76,6 +76,9 @@ See the [Installation Documentation](doc/1_installation.md).
 A very simple example:
 
 ```php
+/**
+ * @return void
+ */
 function foo($bar) {}
 
 // Instead of using:
@@ -85,6 +88,8 @@ foo($baz);
 $foo = Jit::JitFu('foo');
 $foo($baz);
 ```
+
+Note that a docblock *must* be present, and must document every parameter type and the return type.
 
 Check out the `examples` folder for more examples!
 
