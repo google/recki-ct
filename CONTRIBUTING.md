@@ -51,4 +51,4 @@ We've also received CLAs from the following people:
  * andy.huang (Andy Huang)
  * GrahamCampbell (Graham Campbell)
  * pborreli (Pascal Borreli)
-
+ * Ralt (Florian Margaine)
