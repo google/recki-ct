@@ -73,7 +73,20 @@ See the [Installation Documentation](doc/1_installation.md).
 
 ## How do I use Recki-CT?
 
-Check out the examples folder for examples!
+A very simple example:
+
+```php
+function foo($bar) {}
+
+// Instead of using:
+foo($baz);
+
+// Use:
+$foo = Jit::JitFu('foo');
+$foo($baz);
+```
+
+Check out the `examples` folder for more examples!
 
 ## License
 
