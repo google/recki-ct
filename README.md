@@ -21,6 +21,7 @@ Recki-CT
 ========
 
 [![Build Status](https://travis-ci.org/google/recki-ct.svg?branch=master)](https://travis-ci.org/google/recki-ct)
+[![Coverage Status](https://img.shields.io/coveralls/google/recki-ct.svg)](https://coveralls.io/r/google/recki-ct?branch=master)
 
 The **Recki Compiler Toolkit** for PHP
 

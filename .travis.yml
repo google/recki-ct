@@ -19,7 +19,7 @@ before_script:
 script:
   - mkdir -p build/logs
   - phpunit -c phpunit.full.xml
-  - phpunit -c phpunit.xml.dist test/Integration
+  - $HOME/bin/php phpunit -c phpunit.xml.dist test/Integration
 
 after_script:
   - php vendor/bin/coveralls -v
