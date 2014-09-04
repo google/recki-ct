@@ -3,10 +3,23 @@ php:
   - 5.5
   - 5.6
 
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install texinfo curl openssl libxml2
+
 before_script:
+  - mkdir -p build/ext
+  - git clone https://github.com/krakjoe/jitfu.git build/ext
+  - (cd build/ext; ./travis/compile-php.sh)
+  - (cd build/ext; ./travis/compile-libjit.sh)
+  - (cd build/ext; ./travis/compile-ext.sh)
   - composer self-update
   - composer install --dev --prefer-source
 
 script:
   - mkdir -p build/logs
-  - phpunit -c phpunit.xml.dist
+  - phpunit -c phpunit.full.xml
+  - phpunit -c phpunit.xml.dist test/Integration
+
+after_script:
+  - php vendor/bin/coveralls -v

@@ -28,9 +28,9 @@
 
     "require-dev": {
         "phpunit/phpunit": "4.*",
-        "phploc/phploc": "2.*",
         "phpdocumentor/graphviz": "1.0.*",
         "mockery/mockery": "0.9.*",
+        "satooshi/php-coveralls": "0.6.*",
         "phake/phake": "2.0.*@beta"
     },
 

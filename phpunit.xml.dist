@@ -6,44 +6,18 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
-         forceCoversAnnotation="true"
-         mapTestClassNameToCoveredClassName="false"
          processIsolation="false"
-         processUncoveredFilesFromWhitelist="true"
-         stopOnError="false"
-         stopOnFailure="false"
+         stopOnError="true"
+         stopOnFailure="true"
          stopOnIncomplete="false"
          stopOnSkipped="false"
-         strict="false"
-         verbose="false"
          testsuite="unit">
     <testsuites>
         <testsuite name="unit">
             <directory>test/Unit</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist>
-            <directory suffix=".php">lib/ReckiCT</directory>
-        </whitelist>
-    </filter>
     <listeners>
         <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
     </listeners>
-    <logging>
-        <log
-            type="coverage-html"
-            target="build/coverage"
-            charset="UTF-8"
-            yui="true"
-            highlight="true"
-            lowUpperBound="35"
-            highLowerBound="70"
-            showUncoveredFiles="true"
-            />
-        <log 
-            type="coverage-clover"
-            target="build/logs/clover.xml"
-            />
-    </logging>
 </phpunit>
