@@ -1,9 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
     ],
-    "hash": "4e691de3611e2ae42a63b693e016ae04",
+    "hash": "220c25fa3d56992b800146a903cb3f11",
     "packages": [
         {
             "name": "nikic/php-parser",
@@ -240,6 +241,44 @@
                 "web service"
             ],
             "time": "2014-08-11 04:32:36"
+        },
+        {
+            "name": "krakjoe/jitfu",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/krakjoe/jitfu.git",
+                "reference": "d786850afa3a6025376ab42d73df7c449f2ab7a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/krakjoe/jitfu/zipball/d786850afa3a6025376ab42d73df7c449f2ab7a6",
+                "reference": "d786850afa3a6025376ab42d73df7c449f2ab7a6",
+                "shasum": ""
+            },
+            "type": "project",
+            "autoload": {
+                "psr-4": {
+                    "JITFU\\": "stubs"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "PHP License"
+            ],
+            "authors": [
+                {
+                    "name": "Joe Watkins",
+                    "email": "krakjoe@php.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Stubs and sources for JITFu",
+            "homepage": "https://github.com/krakjoe/jitfu",
+            "keywords": [
+                "jit"
+            ],
+            "time": "2014-09-04 16:00:43"
         },
         {
             "name": "mockery/mockery",
@@ -1578,8 +1617,10 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "nikic/php-parser": 20,
+        "krakjoe/jitfu": 20,
         "phake/phake": 10
     },
+    "prefer-stable": false,
     "platform": {
         "php-64bit": ">=5.5.0"
     },

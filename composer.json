@@ -31,6 +31,7 @@
         "phpdocumentor/graphviz": "1.0.*",
         "mockery/mockery": "0.9.*",
         "satooshi/php-coveralls": "0.6.*",
+        "krakjoe/jitfu": "dev-master",
         "phake/phake": "2.0.*@beta"
     },
 
@@ -47,12 +48,8 @@
                 "test/src/Mocks/ReckiCT/",
                 "test/Unit/ReckiCT/"
 
-            ],
-            "JITFU\\": "test/src/Stubs/JITFU/"
-        },
-        "files": [
-            "test/src/Stubs/JITFU/constants.php"
-        ]
+            ]
+        }
     }
 
 }

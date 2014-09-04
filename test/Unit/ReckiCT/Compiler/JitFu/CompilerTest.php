@@ -158,12 +158,7 @@ class CompilerTest extends TestCase
             ['return', '$1'],
         ];
         $func = $this->compiler->convertToCallable($instructions);
-        $sig = $func->getSignature();
         $this->assertInstanceOf(JitFunc::class, $func);
-        $this->assertSame(JitType::of(JitType::long), $sig->getReturnType());
-        $this->assertSame(JitType::of(JitType::long), $sig->getParamType(0));
-        $this->assertNull($sig->getParamType(1));
-
         $f2 = $this->compiler->convertToCallable($instructions);
         $this->assertSame($func, $f2);
     }
