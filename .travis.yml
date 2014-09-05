@@ -10,9 +10,8 @@ before_install:
 before_script:
   - mkdir -p build/ext
   - git clone https://github.com/krakjoe/jitfu.git build/ext
-  - (cd build/ext; ./travis/compile-php.sh)
   - (cd build/ext; ./travis/compile-libjit.sh)
-  - (cd build/ext; ./travis/compile-ext.sh)
+  - (travis/build-jitfu.sh)
   - composer self-update
   - composer install --dev --prefer-source
 
