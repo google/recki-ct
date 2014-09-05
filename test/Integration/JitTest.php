@@ -30,9 +30,21 @@ namespace ReckiCT\Integration {
     class JitTest extends TestCase
     {
 
+        public static function provideOperatorTest() {
+            $result = [
+                ['add', [1, 3]],
+                ['add', [1, 2]],
+                ['add', [50, 50]],
+            ];
+            foreach ($result as $k => $v) {
+                $result[$k][0] = "ReckiCT\IntegrationFunctions\\" . $v[0];
+            }
+            return $result;
+        }
+
         public function testStrlen()
         {
-            $cb = Jit::JitFu("ReckiCT\Mocks\getStrlen");
+            $cb = Jit::JitFu("ReckiCT\IntegrationFunctions\getStrlen");
             $string = "";
             for ($i = 0; $i < 1000; $i++) {
                 $this->assertEquals($i, $cb($string), "For iteration $i");
@@ -42,7 +54,7 @@ namespace ReckiCT\Integration {
 
         public function testCount()
         {
-            $cb = Jit::JitFu("ReckiCT\Mocks\getCount");
+            $cb = Jit::JitFu("ReckiCT\IntegrationFunctions\getCount");
             $array = [];
             for ($i = 0; $i < 1000; $i++) {
                 $this->assertEquals($i, $cb($array), "For iteration $i");
@@ -50,11 +62,21 @@ namespace ReckiCT\Integration {
             }
         }
 
+        /**
+         * @dataProvider provideOperatorTest
+         */
+        public function testOperator($func, $args) {
+            $cb = Jit::JitFu($func);
+            $expected = call_user_func_array($func, $args);
+            $actual = call_user_func_array($cb, $args);
+            $this->assertEquals($expected, $actual);
+        }
+
     }
 
 }
 
-namespace ReckiCT\Mocks {
+namespace ReckiCT\IntegrationFunctions {
 
     /**
      * @param  string $a
@@ -72,6 +94,15 @@ namespace ReckiCT\Mocks {
     function getCount($a)
     {
         return count($a);
+    }
+
+    /**
+     * @param int $a
+     * @param int $b
+     * @return int The result
+     */
+    function add($a, $b) {
+        return $a + $b;
     }
 
 }
