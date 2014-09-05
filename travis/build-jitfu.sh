@@ -1,7 +1,7 @@
 #!/bin/sh -x
 set -e
 cd $TRAVIS_BUILD_DIR/build/ext
-$HOME/bin/phpize
+phpize
 ./configure
 make -j2 --quiet
 make install
