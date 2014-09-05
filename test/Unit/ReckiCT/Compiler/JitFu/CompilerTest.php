@@ -87,6 +87,7 @@ class CompilerTest extends TestCase
             ['double', JitType::of(JitType::double)],
             ['string', JitType::of(JitType::string)],
             ['void', JitType::of(JitType::void)],
+            ['long[]', new JitType(JitType::of(JitType::int), true)],
         ];
     }
 
