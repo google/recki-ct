@@ -18,7 +18,7 @@ before_script:
 script:
   - mkdir -p build/logs
   - vendor/bin/phpunit -c phpunit.full.xml
-  - $HOME/bin/php vendor/bin/phpunit -c phpunit.xml.dist test/Integration
+  - vendor/bin/phpunit -c phpunit.xml.dist test/Integration
 
 after_script:
   - php vendor/bin/coveralls -v
