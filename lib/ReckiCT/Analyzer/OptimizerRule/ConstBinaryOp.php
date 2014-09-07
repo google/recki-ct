@@ -22,7 +22,7 @@
 
 namespace ReckiCT\Analyzer\OptimizerRule;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use ReckiCT\Graph\Constant;
 
@@ -37,7 +37,7 @@ use ReckiCT\Graph\Vertex\BinaryOp as JitBinaryOp;
 
 class ConstBinaryOp implements OptimizerRule
 {
-    public function process(Vertex $vertex, DirectedAdjacencyList $graph)
+    public function process(Vertex $vertex, Digraph $graph)
     {
         if ($vertex instanceof JitBinaryOp && $vertex->getA() instanceof Constant && $vertex->getB() instanceof Constant) {
             $ret = null;

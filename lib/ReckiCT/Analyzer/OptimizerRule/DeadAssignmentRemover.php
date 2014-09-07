@@ -22,7 +22,7 @@
 
 namespace ReckiCT\Analyzer\OptimizerRule;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use ReckiCT\Graph\Assignment;
 use ReckiCT\Graph\Variable;
@@ -33,7 +33,7 @@ use ReckiCT\Analyzer\OptimizerRule;
 
 class DeadAssignmentRemover implements OptimizerRule
 {
-    public function process(Vertex $vertex, DirectedAdjacencyList $graph)
+    public function process(Vertex $vertex, Digraph $graph)
     {
         if ($vertex instanceof Assignment && $vertex->isIdempotent() && 1 >= $this->countUsages($vertex->getResult(), $graph)) {
             Helper::remove($vertex, $graph);
@@ -44,10 +44,10 @@ class DeadAssignmentRemover implements OptimizerRule
         return false;
     }
 
-    public function countUsages(Variable $var, DirectedAdjacencyList $graph)
+    public function countUsages(Variable $var, Digraph $graph)
     {
         $counter = 0;
-        foreach ($graph->eachVertex() as $vtx => $_) {
+        foreach ($graph->vertices() as $vtx) {
             if (in_array($var, $vtx->getVariables(), true)) {
                 $counter++;
             }

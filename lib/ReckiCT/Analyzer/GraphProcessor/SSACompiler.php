@@ -35,7 +35,7 @@ use ReckiCT\Graph\Algo\Dominator;
 use ReckiCT\Graph\Vertex\Function_ as JitFunction;
 use ReckiCT\Analyzer\GraphProcessor;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 class SSACompiler implements GraphProcessor
 {
@@ -67,7 +67,7 @@ class SSACompiler implements GraphProcessor
         }
     }
 
-    public function implementSSA(Variable $old, Variable $new, Vertex $vertex, DirectedAdjacencyList $graph, \SplObjectStorage $phiNodes, array $args)
+    public function implementSSA(Variable $old, Variable $new, Vertex $vertex, Digraph $graph, \SplObjectStorage $phiNodes, array $args)
     {
         if ($this->stack->contains($vertex)) {
             if (isset($phiNodes[$vertex])) {
@@ -103,7 +103,7 @@ class SSACompiler implements GraphProcessor
             }
         }
 
-        foreach ($graph->eachAdjacent($vertex) as $sub) {
+        foreach ($graph->successorsOf($vertex) as $sub) {
             // Depth first search
             $this->implementSSA($old, $new, $sub, $graph, $phiNodes, $args);
         }
@@ -125,7 +125,7 @@ class SSACompiler implements GraphProcessor
         return $return;
     }
 
-    public function findPhiNodes(Variable $var, array $assignments, Dominator $dominator, DirectedAdjacencyList $graph)
+    public function findPhiNodes(Variable $var, array $assignments, Dominator $dominator, Digraph $graph)
     {
         $allDf = new \SplObjectStorage();
         $new = $assignments;

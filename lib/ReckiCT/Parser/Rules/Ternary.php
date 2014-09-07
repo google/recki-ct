@@ -47,7 +47,7 @@ class Ternary implements Rule
         $label = new JitNoOp();
         $end = new JitNoOp();
         $jmp = $state->addVertex(new JitJumpZ($label, $cond));
-        $state->graph->addDirectedEdge($jmp, $label);
+        $state->graph->ensureArc($jmp, $label);
         if ($stmt->if) {
             $state->addVertex(new JitAssign(
                 $state->parser->parseNode($stmt->if, $state),

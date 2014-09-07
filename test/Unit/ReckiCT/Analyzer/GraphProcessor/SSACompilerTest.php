@@ -64,12 +64,12 @@ class SSACompilerTest extends TestCase
         $noOp = new NoOp();
         $jumpZ = new JumpZ($noOp, $a);
         $end = new End();
-        $graph->addDirectedEdge($func, $jumpZ);
-        $graph->addDirectedEdge($jumpZ, $r1 = new Return_($a));
-        $graph->addDirectedEdge($r1, $end);
-        $graph->addDirectedEdge($jumpZ, $noOp);
-        $graph->addDirectedEdge($noOp, $r2 = new Return_($b = new Variable()));
-        $graph->addDirectedEdge($r2, $end);
+        $graph->ensureArc($func, $jumpZ);
+        $graph->ensureArc($jumpZ, $r1 = new Return_($a));
+        $graph->ensureArc($r1, $end);
+        $graph->ensureArc($jumpZ, $noOp);
+        $graph->ensureArc($noOp, $r2 = new Return_($b = new Variable()));
+        $graph->ensureArc($r2, $end);
         $state = new GraphState($func);
         $compiler = new SSACompiler();
         $compiler->process($state);
@@ -89,7 +89,7 @@ class SSACompilerTest extends TestCase
         $vertex = new NoOp();
 
         $graph->expects($this->once())
-            ->method('eachAdjacent')
+            ->method('successorsOf')
             ->with($this->identicalTo($vertex))
             ->will($this->returnValue([]));
 
@@ -113,13 +113,13 @@ class SSACompilerTest extends TestCase
         $noOp = new NoOp();
         $jumpZ = new JumpZ($noOp, $a);
         $end = new End();
-        $graph->addDirectedEdge($func, $jumpZ);
-        $graph->addDirectedEdge($jumpZ, $r1 = new Return_($a));
-        $graph->addDirectedEdge($r1, $end);
-        $graph->addDirectedEdge($jumpZ, $noOp);
-        $graph->addDirectedEdge($noOp, $binary = new BinaryOp(BinaryOp::PLUS, $a, new Constant(2), $a));
-        $graph->addDirectedEdge($binary, $r2 = new Return_($a));
-        $graph->addDirectedEdge($r2, $end);
+        $graph->ensureArc($func, $jumpZ);
+        $graph->ensureArc($jumpZ, $r1 = new Return_($a));
+        $graph->ensureArc($r1, $end);
+        $graph->ensureArc($jumpZ, $noOp);
+        $graph->ensureArc($noOp, $binary = new BinaryOp(BinaryOp::PLUS, $a, new Constant(2), $a));
+        $graph->ensureArc($binary, $r2 = new Return_($a));
+        $graph->ensureArc($r2, $end);
         $state = new GraphState($func);
         $compiler = new SSACompiler();
 
@@ -144,13 +144,13 @@ class SSACompilerTest extends TestCase
         $noOp = new NoOp();
         $jumpz = new JumpZ($noOp, $a);
 
-        $graph->addDirectedEdge($func, $start);
-        $graph->addDirectedEdge($start, $jumpz);
-        $graph->addDirectedEdge($jumpz, $r = new Return_($a));
-        $graph->addDirectedEdge($r, new End());
-        $graph->addDirectedEdge($jumpz, $binary = new BinaryOp(BinaryOp::PLUS, $a, new Constant(2), $a));
-        $graph->addDirectedEdge($binary, $j = new Jump());
-        $graph->addDirectedEdge($j, $start);
+        $graph->ensureArc($func, $start);
+        $graph->ensureArc($start, $jumpz);
+        $graph->ensureArc($jumpz, $r = new Return_($a));
+        $graph->ensureArc($r, new End());
+        $graph->ensureArc($jumpz, $binary = new BinaryOp(BinaryOp::PLUS, $a, new Constant(2), $a));
+        $graph->ensureArc($binary, $j = new Jump());
+        $graph->ensureArc($j, $start);
 
         $state = new GraphState($func);
         $compiler = new SSACompiler();
@@ -159,7 +159,7 @@ class SSACompilerTest extends TestCase
 
         $this->assertSame([$a], $func->getArguments());
         $i = 0;
-        foreach ($graph->eachAdjacent($start) as $v) {
+        foreach ($graph->successorsOf($start) as $v) {
             $this->assertEquals(0, $i++, 'More then one adjacent node');
             $this->assertInstanceOf(Phi::class, $v);
             $this->assertContains($a, $v->getValues());

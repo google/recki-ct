@@ -48,7 +48,7 @@ class OptimizerTest extends TestCase
     {
         $graph = new DirectedAdjacencyList();
         $func = new Function_([], new Type(0), $graph);
-        $graph->addVertex($func);
+        $graph->ensureVertex($func);
         $state = new GraphState($func);
 
         $resolver = new Optimizer();

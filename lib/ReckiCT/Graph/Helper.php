@@ -25,69 +25,69 @@ use ReckiCT\Graph\Vertex\Phi as JitPhi;
 
 use ReckiCT\Util\Shim;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 class Helper
 {
-    public static function insertAfter(Vertex $old, Vertex $new, DirectedAdjacencyList $graph)
+    public static function insertAfter(Vertex $old, Vertex $new, Digraph $graph)
     {
         $toRemove = array();
-        foreach ($graph->eachAdjacent($old) as $node) {
-            $graph->addDirectedEdge($new, $node);
+        foreach ($graph->successorsOf($old) as $node) {
+            $graph->ensureArc($new, $node);
             $toRemove[] = $node;
         }
-        $graph->addDirectedEdge($old, $new);
+        $graph->ensureArc($old, $new);
         foreach ($toRemove as $node) {
-            $graph->removeEdge($old, $node);
+            $graph->removeArc($old, $node);
         }
     }
 
-    public static function replace(Vertex $old, Vertex $new, DirectedAdjacencyList $graph)
+    public static function replace(Vertex $old, Vertex $new, Digraph $graph)
     {
         foreach (self::getInboundNodes($old, $graph) as $n1) {
-            $graph->addDirectedEdge($n1, $new);
+            $graph->ensureArc($n1, $new);
         }
-        foreach ($graph->eachAdjacent($old) as $n2) {
-            $graph->addDirectedEdge($new, $n2);
+        foreach ($graph->successorsOf($old) as $n2) {
+            $graph->ensureArc($new, $n2);
         }
         $graph->removeVertex($old);
     }
 
-    public static function remove(Vertex $old, DirectedAdjacencyList $graph)
+    public static function remove(Vertex $old, Digraph $graph)
     {
         foreach (self::getInboundNodes($old, $graph) as $n1) {
-            foreach ($graph->eachAdjacent($old) as $n2) {
-                $graph->addDirectedEdge($n1, $n2);
+            foreach ($graph->successorsOf($old) as $n2) {
+                $graph->ensureArc($n1, $n2);
             }
         }
         $graph->removeVertex($old);
     }
 
-    public static function getInboundNodes($vertex, DirectedAdjacencyList $graph)
+    public static function getInboundNodes($vertex, Digraph $graph)
     {
         // run each time, since the graph may change...
         return $graph->transpose()
-            ->eachAdjacent($vertex);
+            ->successorsOf($vertex);
     }
 
-    public static function computePredecessors(DirectedAdjacencyList $graph)
+    public static function computePredecessors(Digraph $graph)
     {
         $reversed = $graph->transpose();
         $predecessors = new \SplObjectStorage();
-        foreach ($reversed->eachVertex() as $vertex => $_) {
+        foreach ($reversed->vertices() as $vertex) {
             $predecessors[$vertex] = self::findAllSuccessors($vertex, $reversed);
         }
 
         return $predecessors;
     }
 
-    public static function computeImmediatePredecessors(DirectedAdjacencyList $graph)
+    public static function computeImmediatePredecessors(Digraph $graph)
     {
         $reversed = $graph->transpose();
         $predecessors = new \SplObjectStorage();
-        foreach ($reversed->eachVertex() as $vertex => $_) {
+        foreach ($reversed->vertices() as $vertex) {
             $tmp = array();
-            foreach ($reversed->eachAdjacent($vertex) as $sub) {
+            foreach ($reversed->successorsOf($vertex) as $sub) {
                 $tmp[] = $sub;
             }
             $predecessors[$vertex] = Shim::array_unique($tmp);
@@ -98,7 +98,7 @@ class Helper
 
     protected static $processing;
 
-    public static function findAllSuccessors(Vertex $node, DirectedAdjacencyList $graph)
+    public static function findAllSuccessors(Vertex $node, Digraph $graph)
     {
         if (is_null(self::$processing)) {
             self::$processing = new \SplObjectStorage();
@@ -108,7 +108,7 @@ class Helper
         }
         self::$processing[$node] = true;
         $result = array();
-        foreach ($graph->eachAdjacent($node) as $sub) {
+        foreach ($graph->successorsOf($node) as $sub) {
             $result[] = $sub;
             $result = array_merge($result, self::findAllSuccessors($sub, $graph));
         }
@@ -117,10 +117,10 @@ class Helper
         return Shim::array_unique($result);
     }
 
-    public static function findVerticesByClass($class, DirectedAdjacencyList $graph)
+    public static function findVerticesByClass($class, Digraph $graph)
     {
         $result = [];
-        foreach ($graph->eachVertex() as $vertex => $_) {
+        foreach ($graph->vertices() as $vertex) {
             if ($vertex instanceof $class) {
                 $result[] = $vertex;
             }
@@ -129,10 +129,10 @@ class Helper
         return $result;
     }
 
-    public static function findVariables(DirectedAdjacencyList $graph)
+    public static function findVariables(Digraph $graph)
     {
         $vars = new \SplObjectStorage();
-        foreach ($graph->eachVertex() as $vertex => $_) {
+        foreach ($graph->vertices() as $vertex) {
             foreach ($vertex->getVariables() as $var) {
                 if (!$var instanceof Constant) {
                     $vars->attach($var);
@@ -143,9 +143,9 @@ class Helper
         return iterator_to_array($vars);
     }
 
-    public static function isPhiVar(Variable $var, DirectedAdjacencyList $graph)
+    public static function isPhiVar(Variable $var, Digraph $graph)
     {
-        foreach ($graph->eachVertex() as $vertex => $_) {
+        foreach ($graph->vertices() as $vertex) {
             if ($vertex instanceof JitPhi && in_array($var, $vertex->getVariables(), true)) {
                 return true;
             }
@@ -154,7 +154,7 @@ class Helper
         return false;
     }
 
-    public static function isLiveVar(Variable $var, Vertex $vtx, DirectedAdjacencyList $graph)
+    public static function isLiveVar(Variable $var, Vertex $vtx, Digraph $graph)
     {
         static $seen = [];
         if (in_array($vtx, $seen, true)) {
@@ -164,7 +164,7 @@ class Helper
         }
 
         $seen[] = $vtx;
-        foreach ($graph->eachAdjacent($vtx) as $sub) {
+        foreach ($graph->successorsOf($vtx) as $sub) {
             if (self::isLiveVar($var, $sub, $graph)) {
                 array_pop($seen);
 

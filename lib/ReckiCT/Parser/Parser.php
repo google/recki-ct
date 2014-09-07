@@ -88,9 +88,9 @@ class Parser
     public function addEndNode(State $state)
     {
         $end = $state->addVertex(new JitEnd());
-        foreach ($state->graph->eachVertex() as $vertex => $_) {
+        foreach ($state->graph->vertices() as $vertex) {
             if ($vertex instanceof JitReturn) {
-                $state->graph->addDirectedEdge($vertex, $end);
+                $state->graph->ensureArc($vertex, $end);
             }
         }
     }

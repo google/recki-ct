@@ -22,7 +22,7 @@
 
 namespace ReckiCT\Analyzer\OptimizerRule;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use ReckiCT\Type;
 
@@ -32,7 +32,7 @@ use ReckiCT\Analyzer\OptimizerRule;
 
 class BooleanNot implements OptimizerRule
 {
-    public function process(Vertex $vertex, DirectedAdjacencyList $graph)
+    public function process(Vertex $vertex, Digraph $graph)
     {
         if ($vertex->getName() === 'BooleanNot') {
             if ($vertex->getResult()->getType()->isUnknown() && !$vertex->getValue()->getType()->isUnknown()) {

@@ -46,7 +46,7 @@ class Label implements Rule
         $state->labels[$stmt->name] = $label;
         if (isset($state->gotolist[$stmt->name])) {
             foreach ($state->gotolist[$stmt->name] as $node) {
-                $state->graph->addDirectedEdge($node, $label);
+                $state->graph->ensureArc($node, $label);
             }
         }
     }

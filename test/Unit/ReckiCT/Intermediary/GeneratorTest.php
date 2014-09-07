@@ -305,7 +305,7 @@ EOF;
         $state->labelidx = 1;
 
         $vertex = new Vertex\Jump();
-        $state->graph->addDirectedEdge($vertex, $noOp);
+        $state->graph->ensureArc($vertex, $noOp);
 
         $expected = 'jump @2';
         $this->assertEquals($expected, $generator->getTypedOutput($vertex, $state));
@@ -326,7 +326,7 @@ EOF;
         $state->labelidx = 1;
 
         $vertex = new Vertex\Jump();
-        $state->graph->addDirectedEdge($vertex, $noOp);
+        $state->graph->ensureArc($vertex, $noOp);
 
         $expected = '';
         $this->assertEquals($expected, $generator->getTypedOutput($vertex, $state));
@@ -347,12 +347,12 @@ EOF;
         $noOp = new Vertex\NoOp();
         $jumpz = new Vertex\JumpZ($noOp, $a);
         $end = new Vertex\End();
-        $graph->addDirectedEdge($func, $jumpz);
-        $graph->addDirectedEdge($jumpz, $noOp);
-        $graph->addDirectedEdge($jumpz, $r1 = new Vertex\Return_(new Constant(1.5)));
-        $graph->addDirectedEdge($r1, $end);
-        $graph->addDirectedEdge($noOp, $r2 = new Vertex\Return_($b));
-        $graph->addDirectedEdge($r2, $end);
+        $graph->ensureArc($func, $jumpz);
+        $graph->ensureArc($jumpz, $noOp);
+        $graph->ensureArc($jumpz, $r1 = new Vertex\Return_(new Constant(1.5)));
+        $graph->ensureArc($r1, $end);
+        $graph->ensureArc($noOp, $r2 = new Vertex\Return_($b));
+        $graph->ensureArc($r2, $end);
 
         $expected = <<<'EOF'
 function test123 double
@@ -384,12 +384,12 @@ EOF;
         $noOp = new Vertex\NoOp();
         $jumpz = new Vertex\JumpZ($noOp, $a);
         $end = new Vertex\End();
-        $graph->addDirectedEdge($func, $jumpz);
-        $graph->addDirectedEdge($jumpz, $r1 = new Vertex\Return_(new Constant(1.5)));
-        $graph->addDirectedEdge($jumpz, $noOp);
-        $graph->addDirectedEdge($r1, $end);
-        $graph->addDirectedEdge($noOp, $r2 = new Vertex\Return_($b));
-        $graph->addDirectedEdge($r2, $end);
+        $graph->ensureArc($func, $jumpz);
+        $graph->ensureArc($jumpz, $r1 = new Vertex\Return_(new Constant(1.5)));
+        $graph->ensureArc($jumpz, $noOp);
+        $graph->ensureArc($r1, $end);
+        $graph->ensureArc($noOp, $r2 = new Vertex\Return_($b));
+        $graph->ensureArc($r2, $end);
 
         $expected = <<<'EOF'
 function test123 double

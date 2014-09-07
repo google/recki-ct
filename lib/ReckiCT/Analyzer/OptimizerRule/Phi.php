@@ -22,7 +22,7 @@
 
 namespace ReckiCT\Analyzer\OptimizerRule;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use ReckiCT\Type;
 
@@ -34,7 +34,7 @@ use ReckiCT\Analyzer\OptimizerRule;
 
 class Phi implements OptimizerRule
 {
-    public function process(Vertex $vertex, DirectedAdjacencyList $graph)
+    public function process(Vertex $vertex, Digraph $graph)
     {
         if ($vertex instanceof Vertex\Phi) {
             $types = [];
@@ -71,7 +71,7 @@ class Phi implements OptimizerRule
                 // remove phi node
                 list ($val) = iterator_to_array($vertex->getValues());
                 $result = $vertex->getResult();
-                foreach ($graph->eachVertex() as $vtx => $_) {
+                foreach ($graph->vertices() as $vtx) {
                     $vtx->replaceVariable($result, $val);
                     if ($vtx instanceof Assignment && $vtx->getResult() === $result) {
                         $vtx->setResult($val);

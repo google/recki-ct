@@ -47,7 +47,7 @@ class GraphStateTest extends TestCase
     public function testBasicUsage()
     {
         $func = new JitFunction([], new Type(0), $graph = new DirectedAdjacencyList());
-        $graph->addDirectedEdge($func, new End());
+        $graph->ensureArc($func, new End());
         $state = new GraphState($func);
         $this->assertSame($func, $state->getFunction());
         $this->assertSame($graph, $state->getGraph());

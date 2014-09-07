@@ -26,7 +26,7 @@ use ReckiCT\Util\Shim;
 
 use ReckiCT\Graph\Helper;
 use ReckiCT\Graph\Vertex;
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 /**
  * This class accepts a Graph and a Vertex, and builds a dominator tree
@@ -35,7 +35,7 @@ use Gliph\Graph\DirectedAdjacencyList;
 class Dominator
 {
     /**
-     * @var DirectedAdjacencyList The graph node for the tree
+     * @var Digraph The graph node for the tree
      */
     protected $graph;
 
@@ -60,7 +60,7 @@ class Dominator
      * @param DirectedAdjacencyList $graph The graph to build the tree for
      * @param Vertex                $start The start node of the dominator
      */
-    public function __construct(DirectedAdjacencyList $graph, Vertex $start)
+    public function __construct(Digraph $graph, Vertex $start)
     {
         $this->dominator = new \SplObjectStorage();
         $this->graph = $graph;
@@ -150,7 +150,7 @@ class Dominator
     public function getFrontier(Vertex $a)
     {
         $result = array();
-        foreach ($this->graph->eachVertex() as $vertex => $_) {
+        foreach ($this->graph->vertices() as $vertex) {
             if ($this->strictlyDominates($vertex, $a)) {
                 continue;
             }
@@ -177,12 +177,12 @@ class Dominator
     protected function build(Vertex $start)
     {
         $this->dominator[$start] = [$start]; // The dominator of the function is itself.
-        foreach ($this->graph->eachVertex() as $vertex => $_) {
+        foreach ($this->graph->vertices() as $vertex) {
             if ($vertex === $start) {
                 continue;
             }
             $dominated = array();
-            foreach ($this->graph->eachVertex() as $sub => $_) {
+            foreach ($this->graph->vertices() as $sub) {
                 if ($sub === $start) {
                     continue;
                 }
@@ -206,7 +206,7 @@ class Dominator
 
         while ($changed) {
             $changed = false;
-            foreach ($this->graph->eachVertex() as $vertex => $_) {
+            foreach ($this->graph->vertices() as $vertex) {
                 if ($vertex === $start) continue;
                 $pred = $this->iPredecessors[$vertex];
 

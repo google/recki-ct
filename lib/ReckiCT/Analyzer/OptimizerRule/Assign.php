@@ -22,7 +22,7 @@
 
 namespace ReckiCT\Analyzer\OptimizerRule;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use ReckiCT\Graph\Vertex;
 
@@ -30,7 +30,7 @@ use ReckiCT\Analyzer\OptimizerRule;
 
 class Assign implements OptimizerRule
 {
-    public function process(Vertex $vertex, DirectedAdjacencyList $graph)
+    public function process(Vertex $vertex, Digraph $graph)
     {
         if ($vertex->getName() === 'Assign') {
             if ($vertex->getResult()->getType()->isUnknown() && !$vertex->getValue()->getType()->isUnknown()) {

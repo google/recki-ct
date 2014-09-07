@@ -22,7 +22,7 @@
 
 namespace ReckiCT\Analyzer\OptimizerRule;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use ReckiCT\Graph\Vertex;
 
@@ -30,7 +30,7 @@ use ReckiCT\Analyzer\OptimizerRule;
 
 class FunctionCall implements OptimizerRule
 {
-    public function process(Vertex $vertex, DirectedAdjacencyList $graph)
+    public function process(Vertex $vertex, Digraph $graph)
     {
         if ($vertex instanceof Vertex\FunctionCall) {
             if ($vertex->getResult()->getType()->isUnknown() && !$vertex->getSignature()->getReturn()->isUnknown()) {

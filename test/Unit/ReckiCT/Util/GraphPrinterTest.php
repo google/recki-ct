@@ -51,9 +51,9 @@ class GraphPrinterTest extends TestCase
         $c = new DummyVertex('c');
 
         $graph = new DirectedAdjacencyList();
-        $graph->addDirectedEdge($a, $b);
-        $graph->addDirectedEdge($b, $c);
-        $graph->addDirectedEdge($c, $b);
+        $graph->ensureArc($a, $b);
+        $graph->ensureArc($b, $c);
+        $graph->ensureArc($c, $b);
 
         $printer = new GraphPrinter();
         $this->assertContains('node_0', $printer->generateText($graph));

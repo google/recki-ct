@@ -28,7 +28,7 @@ class Dumper
     public static function dump(DirectedAdjacencyList $graph)
     {
         $edges = [];
-        foreach ($graph->eachEdge() as $edge) {
+        foreach ($graph->edges() as $edge) {
             $edges[] = $edge[0]->getName() . ' ' . $edge[1]->getName();
         }
 

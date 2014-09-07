@@ -166,14 +166,14 @@ class PhiTest extends TestCase
 
         $graph = $this->getMock(DirectedAdjacencyList::class);
         $graph->expects($this->exactly(1))
-            ->method('eachVertex')
+            ->method('vertices')
             ->will($this->returnValue(call_user_func(function () use ($vertex, $v2) {
-                yield $vertex => array();
-                yield $v2 => array();
+                yield $vertex;
+                yield $v2;
             })));
         $transposed = $this->getMock(DirectedAdjacencyList::class);
         $transposed->expects($this->once())
-            ->method('eachAdjacent')
+            ->method('successorsOf')
             ->with($this->identicalTo($vertex))
             ->will($this->returnValue([]));
         $graph->expects($this->once())

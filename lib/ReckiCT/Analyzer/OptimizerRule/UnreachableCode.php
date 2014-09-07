@@ -22,7 +22,7 @@
 
 namespace ReckiCT\Analyzer\OptimizerRule;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use ReckiCT\Graph\Vertex;
 
@@ -32,9 +32,9 @@ use ReckiCT\Graph\Helper;
 
 class UnreachableCode implements OptimizerRule
 {
-    public function process(Vertex $vertex, DirectedAdjacencyList $graph)
+    public function process(Vertex $vertex, Digraph $graph)
     {
-        if ($graph->inDegree($vertex) === 0 && !$vertex instanceof Vertex\Function_) {
+        if ($graph->inDegreeOf($vertex) === 0 && !$vertex instanceof Vertex\Function_) {
             Helper::remove($vertex, $graph);
 
             return true;

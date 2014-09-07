@@ -81,11 +81,11 @@ class ConstBinaryOpTest extends TestCase
     {
         $graph = new DirectedAdjacencyList();
         $end = new End();
-        $graph->addDirectedEdge($end, $b = new JitBinaryOp($kind, $a, $b, $r));
+        $graph->ensureArc($end, $b = new JitBinaryOp($kind, $a, $b, $r));
         $rule = new ConstBinaryOp();
         $this->assertTrue($rule->process($b, $graph));
         $i = 0;
-        foreach ($graph->eachAdjacent($end) as $vtx) {
+        foreach ($graph->successorsOf($end) as $vtx) {
             $this->assertEquals(0, $i++, 'More than one adjacent vertex found!');
             $this->assertInstanceOf(JitAssign::class, $vtx);
             $this->assertSame($r, $vtx->getResult());
@@ -101,7 +101,7 @@ class ConstBinaryOpTest extends TestCase
     {
         $graph = new DirectedAdjacencyList();
         $end = new End();
-        $graph->addDirectedEdge($end, $b = new JitBinaryOp(JitBinaryOp::PLUS, new Constant(1), new Variable(), new Variable()));
+        $graph->ensureArc($end, $b = new JitBinaryOp(JitBinaryOp::PLUS, new Constant(1), new Variable(), new Variable()));
         $rule = new ConstBinaryOp();
         $this->assertFalse($rule->process($b, $graph));
     }

@@ -24,7 +24,7 @@ namespace ReckiCT\Parser;
 use ReckiCT\Graph\Vertex;
 use ReckiCT\Graph\Variable;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use PhpParser\Node;
 
@@ -44,7 +44,7 @@ class State
     public $parser;
 
     /**
-     * @var \Gliph\Graph\DirectedAdjacencyList The graph being generated
+     * @var \Gliph\Graph\Digraph The graph being generated
      */
     public $graph;
 
@@ -78,7 +78,7 @@ class State
      * @param \ReckiCT\Parser\Parser             $parser The parser instance for this run
      * @param \Gliph\Graph\DirectedAdjacencyList $graph  The graph being built
      */
-    public function __construct(Parser $parser, DirectedAdjacencyList $graph)
+    public function __construct(Parser $parser, Digraph $graph)
     {
         $this->parser = $parser;
         $this->graph = $graph;
@@ -123,7 +123,7 @@ class State
     public function addVertex(Vertex $new)
     {
         if ($this->last) {
-            $this->graph->addDirectedEdge($this->last, $new);
+            $this->graph->ensureArc($this->last, $new);
         }
         $this->last = $new;
 

@@ -54,7 +54,7 @@ class BooleanAnd implements Rule
             $end,
             $left
         ));
-        $state->graph->addDirectedEdge($jmp, $end);
+        $state->graph->ensureArc($jmp, $end);
         $right = $state->parser->parseNode($stmt->right, $state);
         $state->addVertex(new Vertex\Assign(
             $right,

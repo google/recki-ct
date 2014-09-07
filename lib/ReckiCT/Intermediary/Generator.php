@@ -52,7 +52,7 @@ class Generator
         if ($vertex instanceof Vertex\JumpZ) {
             $output .= ' ' . $this->makeLabel($vertex->getTarget(), $state) . "\n";
             $out = [];
-            foreach ($state->graph->eachAdjacent($vertex) as $next) {
+            foreach ($state->graph->successorsOf($vertex) as $next) {
                 $out[] = $next;
             }
             if ($out[0] === $vertex->getTarget()) {
@@ -66,7 +66,7 @@ class Generator
             if ($output) {
                 $output .= "\n";
             }
-            foreach ($state->graph->eachAdjacent($vertex) as $next) {
+            foreach ($state->graph->successorsOf($vertex) as $next) {
                 $output .= $this->generate($next, $state);
             }
         } else {
@@ -90,7 +90,7 @@ class Generator
         } elseif ($vertex instanceof Vertex\NoOp) {
             return 'label ' . $this->makeLabel($vertex, $state);
         } elseif ($vertex instanceof Vertex\Jump) {
-            foreach ($state->graph->eachAdjacent($vertex) as $next) {}
+            foreach ($state->graph->successorsOf($vertex) as $next) {}
             if (isset($state->seen[$next])) {
                 return 'jump ' . $this->makeLabel($next, $state);
             } else {

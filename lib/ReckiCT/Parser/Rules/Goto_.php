@@ -41,7 +41,7 @@ class Goto_ implements Rule
         $goto = $state->addVertex(new Jump());
         $state->last = null;
         if (isset($state->labels[$stmt->name])) {
-            $state->graph->addDirectedEdge($goto, $state->labels[$stmt->name]);
+            $state->graph->ensureArc($goto, $state->labels[$stmt->name]);
 
             return;
         }

@@ -45,10 +45,10 @@ class If_ implements Rule
         if ($stmt->else) {
             $next = new NoOp();
             $if = $state->addVertex(new JumpZ($next, $cond));
-            $state->graph->addDirectedEdge($if, $next);
+            $state->graph->ensureArc($if, $next);
             $state->parser->parseStmtList($stmt->stmts, $state);
             $jmp = $state->addVertex(new Jump());
-            $state->graph->addDirectedEdge($jmp, $end);
+            $state->graph->ensureArc($jmp, $end);
             $state->last = null;
 
             $state->addVertex($next);

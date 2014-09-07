@@ -41,7 +41,7 @@ class PhiResolver implements GraphProcessor
         do {
             $rerun = false;
             $phiNodes = [];
-            foreach ($graph->eachVertex() as $vertex => $_) {
+            foreach ($graph->vertices() as $vertex) {
                 if ($vertex instanceof Phi) {
                     $phiNodes[] = $vertex;
                     $rerun = $rerun || $this->resolve($vertex, $state);
@@ -94,7 +94,7 @@ class PhiResolver implements GraphProcessor
         Helper::remove($vertex, $graph);
         $to = $vertex->getResult();
         foreach ($vertex->getValues() as $value) {
-            foreach ($graph->eachVertex() as $v => $_) {
+            foreach ($graph->vertices() as $v) {
                 $v->replaceVariable($value, $to);
                 if ($v instanceof Assignment && $v->getResult() === $value) {
                     $v->setResult($to);
@@ -109,7 +109,7 @@ class PhiResolver implements GraphProcessor
         foreach ($phiNodes as $phi) {
             $result = $phi->getResult();
             foreach ($phi->getValues() as $value) {
-                $graph->addDirectedEdge($value, $result);
+                $graph->ensureArc($value, $result);
             }
         }
         $cycles = $graph->getCycles();

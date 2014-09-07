@@ -21,12 +21,12 @@
 
 namespace ReckiCT\Analyzer;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use ReckiCT\Graph\Vertex;
 
 interface OptimizerRule
 {
-    public function process(Vertex $vertex, DirectedAdjacencyList $graph);
+    public function process(Vertex $vertex, Digraph $graph);
 
 }

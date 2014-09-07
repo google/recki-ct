@@ -51,18 +51,18 @@ class DominatorTest extends TestCase
             $this->getMock(Vertex::class),
             $this->getMock(Vertex::class),
         ];
-        $this->graph->addDirectedEdge($this->func, $this->v[0]);
+        $this->graph->ensureArc($this->func, $this->v[0]);
         //
         //         2
         // 0 - 1 <   > 4 - 5
         //         3
         //
-        $this->graph->addDirectedEdge($this->v[0], $this->v[1]);
-        $this->graph->addDirectedEdge($this->v[1], $this->v[2]);
-        $this->graph->addDirectedEdge($this->v[1], $this->v[3]);
-        $this->graph->addDirectedEdge($this->v[2], $this->v[4]);
-        $this->graph->addDirectedEdge($this->v[3], $this->v[4]);
-        $this->graph->addDirectedEdge($this->v[4], $this->v[5]);
+        $this->graph->ensureArc($this->v[0], $this->v[1]);
+        $this->graph->ensureArc($this->v[1], $this->v[2]);
+        $this->graph->ensureArc($this->v[1], $this->v[3]);
+        $this->graph->ensureArc($this->v[2], $this->v[4]);
+        $this->graph->ensureArc($this->v[3], $this->v[4]);
+        $this->graph->ensureArc($this->v[4], $this->v[5]);
     }
 
     /**
@@ -128,7 +128,7 @@ class DominatorTest extends TestCase
      */
     public function testFrontier()
     {
-        $this->graph->addDirectedEdge($this->v[0], $this->v[4]);
+        $this->graph->ensureArc($this->v[0], $this->v[4]);
         $dominator = new Dominator($this->graph, $this->func);
         $this->assertSame([], $dominator->getFrontier($this->v[0]));
         $this->assertSame([$this->v[4]], $dominator->getFrontier($this->v[1]));
@@ -148,9 +148,9 @@ class DominatorTest extends TestCase
      */
     public function testFrontierMutatedGraph()
     {
-        $this->graph->addDirectedEdge($this->v[0], $this->v[4]);
+        $this->graph->ensureArc($this->v[0], $this->v[4]);
         $dominator = new Dominator($this->graph, $this->func);
-        $this->graph->addDirectedEdge($this->v[0], $this->getMock(Vertex::class));
+        $this->graph->ensureArc($this->v[0], $this->getMock(Vertex::class));
         $this->assertSame([], $dominator->getFrontier($this->v[0]));
         $this->assertSame([$this->v[4]], $dominator->getFrontier($this->v[1]));
         $this->assertSame([$this->v[4]], $dominator->getFrontier($this->v[2]));

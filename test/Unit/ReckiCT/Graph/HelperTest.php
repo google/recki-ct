@@ -58,12 +58,12 @@ class HelperTest extends TestCase
         // 0 - 1 <   > 4 - 5
         //         3
         //
-        $this->graph->addDirectedEdge($this->v[0], $this->v[1]);
-        $this->graph->addDirectedEdge($this->v[1], $this->v[2]);
-        $this->graph->addDirectedEdge($this->v[1], $this->v[3]);
-        $this->graph->addDirectedEdge($this->v[2], $this->v[4]);
-        $this->graph->addDirectedEdge($this->v[3], $this->v[4]);
-        $this->graph->addDirectedEdge($this->v[4], $this->v[5]);
+        $this->graph->ensureArc($this->v[0], $this->v[1]);
+        $this->graph->ensureArc($this->v[1], $this->v[2]);
+        $this->graph->ensureArc($this->v[1], $this->v[3]);
+        $this->graph->ensureArc($this->v[2], $this->v[4]);
+        $this->graph->ensureArc($this->v[3], $this->v[4]);
+        $this->graph->ensureArc($this->v[4], $this->v[5]);
     }
 
     /**
@@ -87,7 +87,7 @@ class HelperTest extends TestCase
      */
     public function testComputeImmediatePredecessorsWithCycle()
     {
-        $this->graph->addDirectedEdge($this->v[4], $this->v[1]);
+        $this->graph->ensureArc($this->v[4], $this->v[1]);
         $pred = Helper::computeImmediatePredecessors($this->graph);
         $this->assertSame([], $pred[$this->v[0]]);
         $this->assertSame([$this->v[0], $this->v[4]], $pred[$this->v[1]]);
@@ -118,7 +118,7 @@ class HelperTest extends TestCase
      */
     public function testComputePredecessorsWithCycle()
     {
-        $this->graph->addDirectedEdge($this->v[4], $this->v[1]);
+        $this->graph->ensureArc($this->v[4], $this->v[1]);
         $pred = Helper::computePredecessors($this->graph);
         $this->assertSame([$this->v[0], $this->v[4], $this->v[2], $this->v[1], $this->v[3]], $pred[$this->v[1]]);
     }
@@ -130,11 +130,11 @@ class HelperTest extends TestCase
     {
         Helper::insertAfter($this->v[0], $this->v[6], $this->graph);
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[0]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[0]));
         $this->assertEquals(1, count($adj));
         $this->assertSame($this->v[6], $adj[0]);
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[6]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[6]));
         $this->assertEquals(1, count($adj));
         $this->assertSame($this->v[1], $adj[0]);
     }
@@ -146,11 +146,11 @@ class HelperTest extends TestCase
     {
         Helper::insertAfter($this->v[1], $this->v[6], $this->graph);
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[1]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[1]));
         $this->assertEquals(1, count($adj));
         $this->assertSame($this->v[6], $adj[0]);
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[6]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[6]));
         $this->assertEquals(2, count($adj));
         $this->assertSame($this->v[2], $adj[0]);
         $this->assertSame($this->v[3], $adj[1]);
@@ -164,7 +164,7 @@ class HelperTest extends TestCase
         Helper::replace($this->v[1], $this->v[6], $this->graph);
         $this->assertFalse($this->graph->hasVertex($this->v[1]));
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[6]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[6]));
         $this->assertEquals(2, count($adj));
         $this->assertSame($this->v[2], $adj[0]);
         $this->assertSame($this->v[3], $adj[1]);
@@ -178,15 +178,15 @@ class HelperTest extends TestCase
         Helper::replace($this->v[4], $this->v[6], $this->graph);
         $this->assertFalse($this->graph->hasVertex($this->v[4]));
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[2]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[2]));
         $this->assertEquals(1, count($adj));
         $this->assertSame($this->v[6], $adj[0]);
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[3]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[3]));
         $this->assertEquals(1, count($adj));
         $this->assertSame($this->v[6], $adj[0]);
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[6]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[6]));
         $this->assertEquals(1, count($adj));
         $this->assertSame($this->v[5], $adj[0]);
     }
@@ -199,7 +199,7 @@ class HelperTest extends TestCase
         Helper::remove($this->v[1], $this->graph);
         $this->assertFalse($this->graph->hasVertex($this->v[1]));
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[0]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[0]));
         $this->assertEquals(2, count($adj));
         $this->assertSame($this->v[2], $adj[0]);
         $this->assertSame($this->v[3], $adj[1]);
@@ -213,11 +213,11 @@ class HelperTest extends TestCase
         Helper::remove($this->v[4], $this->graph);
         $this->assertFalse($this->graph->hasVertex($this->v[4]));
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[2]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[2]));
         $this->assertEquals(1, count($adj));
         $this->assertSame($this->v[5], $adj[0]);
 
-        $adj = $this->getValues($this->graph->eachAdjacent($this->v[3]));
+        $adj = $this->getValues($this->graph->successorsOf($this->v[3]));
         $this->assertEquals(1, count($adj));
         $this->assertSame($this->v[5], $adj[0]);
     }
@@ -271,7 +271,7 @@ class HelperTest extends TestCase
      */
     public function testisPhiVarResult()
     {
-        $this->graph->addDirectedEdge($this->v[5], new Phi($r = new Variable()));
+        $this->graph->ensureArc($this->v[5], new Phi($r = new Variable()));
         $this->assertTrue(Helper::isPhiVar($r, $this->graph));
     }
 
@@ -280,7 +280,7 @@ class HelperTest extends TestCase
      */
     public function testisPhiVarValue()
     {
-        $this->graph->addDirectedEdge($this->v[5], $p = new Phi(new Variable()));
+        $this->graph->ensureArc($this->v[5], $p = new Phi(new Variable()));
         $p->addValue($a = new Variable());
         $this->assertTrue(Helper::isPhiVar($a, $this->graph));
     }
@@ -290,7 +290,7 @@ class HelperTest extends TestCase
      */
     public function testisPhiVarNonValue()
     {
-        $this->graph->addDirectedEdge($this->v[5], $p = new Phi(new Variable()));
+        $this->graph->ensureArc($this->v[5], $p = new Phi(new Variable()));
         $p->addValue(new Variable());
         $this->assertFalse(Helper::isPhiVar(new Variable(), $this->graph));
     }
@@ -301,7 +301,7 @@ class HelperTest extends TestCase
     public function testFindVerticiesByClass()
     {
         $end = new JitEnd();
-        $this->graph->addDirectedEdge($this->v[5], $end);
+        $this->graph->ensureArc($this->v[5], $end);
         $this->assertSame([$end], Helper::findVerticesByClass(JitEnd::class, $this->graph));
     }
 
@@ -313,7 +313,7 @@ class HelperTest extends TestCase
         $graph = new DirectedAdjacencyList();
         $var = new Variable();
         $vertex = $this->getMock(Vertex::class);
-        $graph->addVertex($vertex);
+        $graph->ensureVertex($vertex);
         $vertex->expects($this->once())
             ->method('getVariables')
             ->will($this->returnValue([$var]));
@@ -328,7 +328,7 @@ class HelperTest extends TestCase
         $graph = new DirectedAdjacencyList();
         $var = new Variable();
         $vertex = $this->getMock(Vertex::class);
-        $graph->addVertex($vertex);
+        $graph->ensureVertex($vertex);
         $vertex->expects($this->once())
             ->method('getVariables')
             ->will($this->returnValue([]));
@@ -337,8 +337,8 @@ class HelperTest extends TestCase
         $v1->expects($this->once())
             ->method('getVariables')
             ->will($this->returnValue([]));
-        $graph->addDirectedEdge($vertex, $v1);
-        $graph->addDirectedEdge($v1, $vertex);
+        $graph->ensureArc($vertex, $v1);
+        $graph->ensureArc($v1, $vertex);
         $this->assertFalse(Helper::isLiveVar($var, $vertex, $graph));
     }
 
@@ -350,7 +350,7 @@ class HelperTest extends TestCase
         $graph = new DirectedAdjacencyList();
         $var = new Variable();
         $vertex = $this->getMock(Vertex::class);
-        $graph->addVertex($vertex);
+        $graph->ensureVertex($vertex);
         $vertex->expects($this->once())
             ->method('getVariables')
             ->will($this->returnValue([]));
@@ -359,7 +359,7 @@ class HelperTest extends TestCase
         $v1->expects($this->once())
             ->method('getVariables')
             ->will($this->returnValue([$var]));
-        $graph->addDirectedEdge($vertex, $v1);
+        $graph->ensureArc($vertex, $v1);
 
         $this->assertTrue(Helper::isLiveVar($var, $vertex, $graph));
     }

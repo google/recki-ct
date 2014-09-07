@@ -20,7 +20,7 @@
  */
 namespace ReckiCT\Util;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 use phpDocumentor\GraphViz\Node;
 use phpDocumentor\GraphViz\Edge;
@@ -37,11 +37,11 @@ class GraphPrinter
     /**
      * Generate a textual representation of the graph
      *
-     * @param \Gliph\Graph\DirectedAdjacencyList $graph The grpah to print
+     * @param \Gliph\Graph\Digraph $graph The grpah to print
      *
      * @return string The generated graph
      */
-    public function generateText(DirectedAdjacencyList $graph)
+    public function generateText(Digraph $graph)
     {
         $tmpfile = tempnam(sys_get_temp_dir(), 'gvz');
         $this->convertGraph($graph)->export('canon', $tmpfile);
@@ -54,14 +54,14 @@ class GraphPrinter
     /**
      * Generate a image representation of the graph, and save to a file
      *
-     * @param \Gliph\Graph\DirectedAdjacencyList $graph    The graph to print
+     * @param \Gliph\Graph\Digraph $graph    The graph to print
      * @param string                             $filename The filename to save the graph to
      * @param string                             $format   The GraphViz format to render to
      *
      * @return string The generated graph
      * @codeCoverageIgnore
      */
-    public function generateImage(DirectedAdjacencyList $graph, $filename, $format = 'svg')
+    public function generateImage(Digraph $graph, $filename, $format = 'svg')
     {
         $this->convertGraph($graph)->export($format, $filename);
     }
@@ -69,20 +69,20 @@ class GraphPrinter
     /**
      * Convert a Graph to a phpDocumentor graph, usable for printing
      *
-     * @param \Gliph\Graph\DirectedAdjacencyList $graph The graph to print
+     * @param \Gliph\Graph\Digraph $graph The graph to print
      *
      * @return \phpDocumentor\GraphViz\Graph The copied graph
      */
-    protected function convertGraph(DirectedAdjacencyList $graph)
+    protected function convertGraph(Digraph $graph)
     {
         $new = Graph::create("dump");
         $nodes = new \SplObjectStorage();
         $ctr = 0;
-        foreach ($graph->eachVertex() as $vertex => $_) {
+        foreach ($graph->vertices() as $vertex) {
             $nodes[$vertex] = Node::create('node_' . $ctr++, (string) $vertex);
             $new->setNode($nodes[$vertex]);
         }
-        foreach ($graph->eachEdge() as $edge) {
+        foreach ($graph->edges() as $edge) {
             $new->link(Edge::create($nodes[$edge[0]], $nodes[$edge[1]]));
         }
 

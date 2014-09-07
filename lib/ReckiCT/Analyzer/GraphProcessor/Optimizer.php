@@ -49,7 +49,7 @@ class Optimizer implements GraphProcessor
         do {
             $rerun = false;
 
-            foreach ($graph->eachVertex() as $vertex => $_) {
+            foreach ($graph->vertices() as $vertex) {
                 foreach ($this->rules as $rule) {
                     $rerun = $rerun || $rule->process($vertex, $graph);
                 }

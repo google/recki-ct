@@ -27,7 +27,7 @@ use ReckiCT\Graph\Vertex;
 use ReckiCT\Graph\Variable;
 use ReckiCT\Type;
 
-use Gliph\Graph\DirectedAdjacencyList;
+use Gliph\Graph\Digraph;
 
 class Function_ extends Vertex
 {
@@ -36,7 +36,7 @@ class Function_ extends Vertex
     protected $type;
     protected $graph;
 
-    public function __construct(array $args, Type $type, DirectedAdjacencyList $graph)
+    public function __construct(array $args, Type $type, Digraph $graph)
     {
         $this->args = $args;
         $this->type = $type;

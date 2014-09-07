@@ -58,7 +58,7 @@ class ParserTest extends TestCase
 
         $this->assertInstanceOf(JitFunction::class, $func);
         $this->assertSame($node->jitType, $func->getReturnType());
-        foreach ($func->getGraph()->eachEdge() as $edge) {
+        foreach ($func->getGraph()->edges() as $edge) {
             $this->assertSame($func, $edge[0]);
             $this->assertInstanceOf(JitEnd::class, $edge[1]);
         }
@@ -158,8 +158,8 @@ class ParserTest extends TestCase
         $a = new JitReturn(new JitVariable());
         $b = new JitReturn(new JitVariable());
         $c = new JitNoOp();
-        $state->graph->addDirectedEdge($c, $a);
-        $state->graph->addDirectedEdge($c, $b);
+        $state->graph->ensureArc($c, $a);
+        $state->graph->ensureArc($c, $b);
         $parser = new Parser();
 
         $parser->addEndNode($state);
@@ -172,7 +172,7 @@ class ParserTest extends TestCase
     protected function assertAdjacent($state, $node, $class, $count)
     {
         $ctr = 0;
-        foreach ($state->graph->eachAdjacent($node) as $next) {
+        foreach ($state->graph->successorsOf($node) as $next) {
             $ctr++;
             $this->assertInstanceOf($class, $next);
         }
