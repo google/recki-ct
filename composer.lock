@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "220c25fa3d56992b800146a903cb3f11",
+    "hash": "e3fe46b0b10d903171164b5ce5110720",
     "packages": [
         {
             "name": "nikic/php-parser",
@@ -102,16 +102,16 @@
         },
         {
             "name": "sdboyer/gliph",
-            "version": "0.6.3",
+            "version": "0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sdboyer/gliph.git",
-                "reference": "6269e8a94b0194166ac167f32c81bec8f5647bcd"
+                "reference": "a2192317529b5985eecbccc6e3a1c4e2c475c4da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sdboyer/gliph/zipball/6269e8a94b0194166ac167f32c81bec8f5647bcd",
-                "reference": "6269e8a94b0194166ac167f32c81bec8f5647bcd",
+                "url": "https://api.github.com/repos/sdboyer/gliph/zipball/a2192317529b5985eecbccc6e3a1c4e2c475c4da",
+                "reference": "a2192317529b5985eecbccc6e3a1c4e2c475c4da",
                 "shasum": ""
             },
             "require": {
@@ -124,7 +124,10 @@
             "type": "library",
             "autoload": {
                 "psr-0": {
-                    "Gliph": "src/"
+                    "Gliph\\": [
+                        "src/",
+                        "tests/"
+                    ]
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -146,7 +149,7 @@
                 "php",
                 "spl"
             ],
-            "time": "2014-08-03 14:11:31"
+            "time": "2014-09-03 17:57:27"
         }
     ],
     "packages-dev": [
@@ -248,12 +251,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/krakjoe/jitfu.git",
-                "reference": "d786850afa3a6025376ab42d73df7c449f2ab7a6"
+                "reference": "fc2078c45b26e66efdd68f2e582f0682155c00c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krakjoe/jitfu/zipball/d786850afa3a6025376ab42d73df7c449f2ab7a6",
-                "reference": "d786850afa3a6025376ab42d73df7c449f2ab7a6",
+                "url": "https://api.github.com/repos/krakjoe/jitfu/zipball/fc2078c45b26e66efdd68f2e582f0682155c00c2",
+                "reference": "fc2078c45b26e66efdd68f2e582f0682155c00c2",
                 "shasum": ""
             },
             "type": "project",
@@ -278,7 +281,7 @@
             "keywords": [
                 "jit"
             ],
-            "time": "2014-09-04 16:00:43"
+            "time": "2014-09-04 18:43:07"
         },
         {
             "name": "mockery/mockery",
@@ -805,16 +808,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.2.4",
+            "version": "4.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "f0c2d374ad06ec1e56c721f4ed87c59ff35f440e"
+                "reference": "c3abe5953d1e60a0bf23012b1bc8c4d07f4832d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f0c2d374ad06ec1e56c721f4ed87c59ff35f440e",
-                "reference": "f0c2d374ad06ec1e56c721f4ed87c59ff35f440e",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c3abe5953d1e60a0bf23012b1bc8c4d07f4832d7",
+                "reference": "c3abe5953d1e60a0bf23012b1bc8c4d07f4832d7",
                 "shasum": ""
             },
             "require": {
@@ -875,20 +878,20 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-08-31 06:46:49"
+            "time": "2014-09-06 18:38:27"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "2.2.0",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "42e589e08bc86e3e9bdf20d385e948347788505b"
+                "reference": "b241b18d87a47093f20fae8b0ba40379b00bd53a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/42e589e08bc86e3e9bdf20d385e948347788505b",
-                "reference": "42e589e08bc86e3e9bdf20d385e948347788505b",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/b241b18d87a47093f20fae8b0ba40379b00bd53a",
+                "reference": "b241b18d87a47093f20fae8b0ba40379b00bd53a",
                 "shasum": ""
             },
             "require": {
@@ -897,7 +900,7 @@
                 "phpunit/php-text-template": "~1.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.2.*@dev"
+                "phpunit/phpunit": "~4.2"
             },
             "suggest": {
                 "ext-soap": "*"
@@ -914,9 +917,6 @@
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
-            "include-path": [
-                ""
-            ],
             "license": [
                 "BSD-3-Clause"
             ],
@@ -933,7 +933,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2014-08-02 13:50:58"
+            "time": "2014-09-06 17:32:37"
         },
         {
             "name": "psr/log",
@@ -1611,20 +1611,15 @@
             "time": "2014-08-31 03:22:04"
         }
     ],
-    "aliases": [
-
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "nikic/php-parser": 20,
         "krakjoe/jitfu": 20,
         "phake/phake": 10
     },
-    "prefer-stable": false,
     "platform": {
         "php-64bit": ">=5.5.0"
     },
-    "platform-dev": [
-
-    ]
+    "platform-dev": []
 }
