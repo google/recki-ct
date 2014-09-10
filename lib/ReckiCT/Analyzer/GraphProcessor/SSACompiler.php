@@ -63,7 +63,7 @@ class SSACompiler implements GraphProcessor
             $phi = $this->findPhiNodes($var, $varAssignments, $dominator, $graph);
 
             $this->implementSSA($var, $var, $state->getFunction(), $graph, $phi, $state->getFunction()->getArguments());
-
+            $this->stack->removeAll($this->stack);
         }
     }
 
@@ -108,7 +108,6 @@ class SSACompiler implements GraphProcessor
             $this->implementSSA($old, $new, $sub, $graph, $phiNodes, $args);
         }
 
-        $this->stack->detach($vertex);
     }
 
     public function findAssignmentsByVar(Variable $var, array $assignments)
