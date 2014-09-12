@@ -171,7 +171,7 @@ We could try brute-forcing the unknowns to see what would result in a valid type
 
 Instead, let's create a graph.
 
-The graph uses variables as verticies, and Phi-assignment as edges.
+The graph uses variables as vertices, and Phi-assignment as edges.
 
 ![Resolve Phi](resources/resolve_phi.png)
 
@@ -208,12 +208,12 @@ If the types are incompatible, resolving them becomes MUCH harder. This isn't im
         }
         return $x1;
 
-    For the trivial case here, that's the obvious course to do. But with complex functions, this can get extremely expensive. It also can result in a combinatoral explosion of operations which would make this technique unrealistic for complex code.
+    For the trivial case here, that's the obvious course to do. But with complex functions, this can get extremely expensive. It also can result in a combinatorial explosion of operations which would make this technique unrealistic for complex code.
 
-2. Using A Varient
+2. Using A Variant
 
-    Since the result is mixed, we could replace each variable with a varient (zval) which stores the current type information in a single struct with the value in a union. This is actually how PHP internally represents values. 
+    Since the result is mixed, we could replace each variable with a variant (zval) which stores the current type information in a single struct with the value in a union. This is actually how PHP internally represents values. 
 
-    The problem with this, is that it requires calling functions to do any operation. So adding two numbers goes from a single CPU operation to a full blown function call. It also requires promoting other interacting variables to varients as well.
+    The problem with this, is that it requires calling functions to do any operation. So adding two numbers goes from a single CPU operation to a full blown function call. It also requires promoting other interacting variables to variants as well.
 
     This will kill the majority of the optimizations that we can gain, so it should be used lightly.
