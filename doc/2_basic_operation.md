@@ -243,6 +243,8 @@ The example function from above (`test()`) would result in the following graph:
 
 ![Post-Resolve-Phi](resources/post-phi-resolve.png)
 
+The overall process if far more complicated, so there's a complete chapter on this topic: [Phi Resolving](5_phi_resolving.md)...
+
 ## Step 7: Generate IR
 
 The CFG is then converted into an [Intermediary Representation](http://en.wikipedia.org/wiki/Intermediate_language), specifically using a custom form of [Three Address Code](http://en.wikipedia.org/wiki/Three_address_code).
