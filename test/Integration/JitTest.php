@@ -50,6 +50,16 @@ namespace ReckiCT\Integration {
             }
         }
 
+        public function testFirst()
+        {
+            $cb = Jit::JitFu("ReckiCT\Mocks\first");
+            $array = [1];
+            for ($i = 0; $i < 10; $i++) {
+                $this->assertEquals(1, $cb($array), "For iteration $i");
+                $array[] = $i;
+            }
+        }
+
     }
 
 }
@@ -72,6 +82,14 @@ namespace ReckiCT\Mocks {
     function getCount($a)
     {
         return count($a);
+    }
+
+    /**
+     * @param int[] $a
+     * @return int  The first value
+     */
+    function first($a) {
+        return $a[0];
     }
 
 }

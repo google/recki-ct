@@ -79,4 +79,52 @@ class ArrayFetchTest extends TestCase
         $this->assertSame($new, $vertex->getResult());
     }
 
+    /**
+     * @covers ::getArray
+     */
+    public function testgetArray()
+    {
+        $vertex = new ArrayFetch($a = new Variable(), $b = new Variable(), $c = new Variable);
+        $this->assertSame($a, $vertex->getArray());
+    }
+
+    /**
+     * @covers ::getDim
+     */
+    public function testgetDim()
+    {
+        $vertex = new ArrayFetch($a = new Variable(), $b = new Variable(), $c = new Variable);
+        $this->assertSame($b, $vertex->getDim());
+    }
+
+    /**
+     * @covers ::replaceVariable
+     */
+    public function testReplaceArray()
+    {
+        $vertex = new ArrayFetch($a = new Variable(), $b = new Variable(), $c = new Variable);
+        $vertex->replaceVariable($a, $new = new Variable);
+        $this->assertSame([$new, $b, $c], $vertex->getVariables());
+    }
+
+    /**
+     * @covers ::replaceVariable
+     */
+    public function testReplaceDim()
+    {
+        $vertex = new ArrayFetch($a = new Variable(), $b = new Variable(), $c = new Variable);
+        $vertex->replaceVariable($b, $new = new Variable);
+        $this->assertSame([$a, $new, $c], $vertex->getVariables());
+    }
+
+    /**
+     * @covers ::replaceVariable
+     */
+    public function testReplaceResult()
+    {
+        $vertex = new ArrayFetch($a = new Variable(), $b = new Variable(), $c = new Variable);
+        $vertex->replaceVariable($c, $new = new Variable);
+        $this->assertSame([$a, $b, $c], $vertex->getVariables());
+    }
+
 }
