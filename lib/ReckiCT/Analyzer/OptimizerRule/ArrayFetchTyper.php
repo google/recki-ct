@@ -16,31 +16,31 @@
  *
  * @copyright 2014 Google Inc. All rights reserved
  * @license http://www.apache.org/licenses/LICENSE-2.0.txt Apache-2.0
- * @package Parser
+ * @package Analyzer
+ * @subpackage OptimizerRule
  */
 
-namespace ReckiCT\Parser;
+namespace ReckiCT\Analyzer\OptimizerRule;
 
-class Factory
+use Gliph\Graph\Digraph;
+
+use ReckiCT\Graph\Vertex;
+
+use ReckiCT\Analyzer\OptimizerRule;
+
+class ArrayFetchTyper implements OptimizerRule
 {
-    public static function parser()
+    public function process(Vertex $vertex, Digraph $graph)
     {
-        $parser = new Parser();
-        $parser->addRule(new Rules\ArrayFetch());
-        $parser->addRule(new Rules\Assign());
-        $parser->addRule(new Rules\BinaryOp());
-        $parser->addRule(new Rules\BooleanAnd());
-        $parser->addRule(new Rules\FunctionCall());
-        $parser->addRule(new Rules\Goto_());
-        $parser->addRule(new Rules\If_());
-        $parser->addRule(new Rules\Label());
-        $parser->addRule(new Rules\PreOp());
-        $parser->addRule(new Rules\PostOp());
-        $parser->addRule(new Rules\Return_());
-        $parser->addRule(new Rules\Ternary());
-        $parser->addRule(new Rules\UnaryOp());
+        if ($vertex->getName() === 'ArrayFetch') {
+            if ($vertex->getResult()->getType()->isUnknown() && !$vertex->getArray()->getType()->getSubType()->isUnknown()) {
+                $vertex->getResult()->setType($vertex->getArray()->getType()->getSubType());
 
-        return $parser;
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

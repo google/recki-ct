@@ -17,30 +17,38 @@
  * @copyright 2014 Google Inc. All rights reserved
  * @license http://www.apache.org/licenses/LICENSE-2.0.txt Apache-2.0
  * @package Parser
+ * @subpackage Rules
  */
 
-namespace ReckiCT\Parser;
+namespace ReckiCT\Parser\Rules;
 
-class Factory
+use ReckiCT\Parser\Rule;
+use ReckiCT\Parser\State;
+
+use PhpParser\Node;
+use PhpParser\Node\Expr\ArrayDimFetch as AstArrayDimFetch;
+use ReckiCT\Graph\Vertex\ArrayFetch as JitArrayFetch;
+use ReckiCT\Graph\Variable;
+
+class ArrayFetch implements Rule
 {
-    public static function parser()
+    public function test(Node $node)
     {
-        $parser = new Parser();
-        $parser->addRule(new Rules\ArrayFetch());
-        $parser->addRule(new Rules\Assign());
-        $parser->addRule(new Rules\BinaryOp());
-        $parser->addRule(new Rules\BooleanAnd());
-        $parser->addRule(new Rules\FunctionCall());
-        $parser->addRule(new Rules\Goto_());
-        $parser->addRule(new Rules\If_());
-        $parser->addRule(new Rules\Label());
-        $parser->addRule(new Rules\PreOp());
-        $parser->addRule(new Rules\PostOp());
-        $parser->addRule(new Rules\Return_());
-        $parser->addRule(new Rules\Ternary());
-        $parser->addRule(new Rules\UnaryOp());
+        return $node instanceof AstArrayDimFetch;
+    }
 
-        return $parser;
+    public function parse(Node $stmt, State $state)
+    {
+        $var = $state->parser->parseNode($stmt->var, $state);
+        $dim = $state->parser->parseNode($stmt->dim, $state);
+
+        $state->addVertex(new JitArrayFetch(
+            $var,
+            $dim,
+            $result = new Variable()
+        ));
+
+        return $result;
     }
 
 }

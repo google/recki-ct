@@ -39,6 +39,7 @@ class Factory
         $analyzer->addProcessor(new GraphProcessor\SSACompiler());
         $resolver = new GraphProcessor\Optimizer();
 
+        $resolver->addRule(new OptimizerRule\ArrayFetchTyper());
         $resolver->addRule(new OptimizerRule\Assign());
         $resolver->addRule(new OptimizerRule\BinaryOp());
         $resolver->addRule(new OptimizerRule\BooleanNot());
