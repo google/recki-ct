@@ -32,7 +32,7 @@ namespace ReckiCT\Integration {
 
         public function testStrlen()
         {
-            $cb = Jit::JitFu("ReckiCT\\Mocks\\getStrlen");
+            $cb = Jit::JitFu("ReckiCT\Mocks\getStrlen");
             $string = "";
             for ($i = 0; $i < 1000; $i++) {
                 $this->assertEquals($i, $cb($string), "For iteration $i");
@@ -42,7 +42,7 @@ namespace ReckiCT\Integration {
 
         public function testCount()
         {
-            $cb = Jit::JitFu("ReckiCT\\Mocks\\getCount");
+            $cb = Jit::JitFu("ReckiCT\Mocks\getCount");
             $array = [];
             for ($i = 0; $i < 1000; $i++) {
                 $this->assertEquals($i, $cb($array), "For iteration $i");
@@ -52,7 +52,7 @@ namespace ReckiCT\Integration {
 
         public function testFirst()
         {
-            $cb = Jit::JitFu("ReckiCT\\Mocks\\first");
+            $cb = Jit::JitFu("ReckiCT\Mocks\first");
             $array = [1];
             for ($i = 0; $i < 10; $i++) {
                 $this->assertEquals(1, $cb($array), "For iteration $i");
