@@ -26,3 +26,13 @@ use ReckiCT\Jit;
 
 class Module
 {
+
+    protected $name;
+
+    protected $functions = array();
+
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+}
