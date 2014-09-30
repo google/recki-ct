@@ -26,7 +26,6 @@ class Factory
     public static function parser()
     {
         $parser = new Parser();
-        $parser->addRule(new Rules\ArrayFetch());
         $parser->addRule(new Rules\Assign());
         $parser->addRule(new Rules\BinaryOp());
         $parser->addRule(new Rules\BooleanAnd());

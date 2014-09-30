@@ -141,17 +141,6 @@ class Compiler extends BaseCompiler
                 $ctx->function->doStore($ctx->scope[$instruction[2]], $ctx->scope[$instruction[1]]);
 
                 return;
-            case 'arrayfetch':
-                $this->storeResultVar(
-                    $instruction[3],
-                    $ctx->function->doLoadElem(
-                        $ctx->scope[$instruction[1]],
-                        $ctx->scope[$instruction[2]]
-                    ),
-                    $ctx
-                );
-
-                return;
             case 'label':
                 if (isset($ctx->labels[$instruction[1]])) {
                     $ctx->function->doLabel($ctx->labels[$instruction[1]]);
