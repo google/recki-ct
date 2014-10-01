@@ -116,6 +116,7 @@ EOF;
         
         foreach ($funcs as $func) {
             $code .= "PHP_FUNCTION({$func->name});\n";
+            $code .= 'static ' . $this->generateInternalFuncSignature($func) . ";\n";
         }
         
         foreach ($funcs as $func) {
@@ -250,6 +251,7 @@ EOF;
             $prefix = '';
             switch ($func[$i][0]) {
                 case 'var':
+                    if ($func[$i][2] === 'void') break;
                     $scope[$func[$i][1]] = $this->convertToCLabel($func[$i][1]);
                     $vars[$scope[$func[$i][1]]] = $this->convertToCType($func[$i][2]);
 
@@ -294,7 +296,10 @@ EOF;
                         $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = ' . $scope[$func[$i][2]] . '.length;';
                         break;
                     }
-                    $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = recki_if_' . strtolower($func[$i][1]) . '(';
+                    if (isset($scope[$func[$i][count($func[$i]) - 1]])) {
+                        $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = ';
+                    }
+                    $code .= 'recki_if_' . strtolower($func[$i][1]) . '(';
                     for ($j = 2; $j < count($func[$i]) - 1; $j++) {
                         $code .= $scope[$func[$i][$j]] . ', ';
                     }
@@ -364,7 +369,7 @@ EOF;
                 return (int) $const[3];
             case 'string':
                 $val = base64_decode($const[3]);
-                return '{"' . addslashes($val) . '", ' . strlen($val) . '}';
+                return '((reckistring){"' . addslashes($val) . '", ' . strlen($val) . '})';
         }
         throw new \RuntimeException("Unknown constant type {$const[2]} with value {$const[3]}");
     }
