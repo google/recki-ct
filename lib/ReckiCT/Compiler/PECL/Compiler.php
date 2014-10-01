@@ -111,6 +111,8 @@ EOF;
         $code .= "#endif\n";
         $code .= "#include \"php.h\"\n";
         $code .= "#include \"php_{$moduleName}.h\"\n";
+
+        $code .= "typedef struct _reckistring { char *string; int length; } reckistring;\n";
         
         foreach ($funcs as $func) {
             $code .= "PHP_FUNCTION({$func->name});\n";
@@ -127,10 +129,16 @@ EOF;
             $zppArgs = '';
             $callArgs = '';
             foreach ($func->params as $param) {
-                $code .= $param[1] . ' ' . $param[0] . ";\n";
+                $code .= $this->convertToCType($param[1]) . ' ' . $param[0] . ";\n";
                 $zppType .= $this->getZppFromType($param[1]);
-                $zppArgs .= ', &' . $param[0];
+
                 $callArgs .= $param[0] . ', ';
+                if ($zppType == 's') {
+                    $zppArgs .= ', &' . $param[0] . '.string, &' . $param[0] . '.length';
+                } else {
+                    $zppArgs .= ', &' . $param[0];
+                }
+
             }
             $code .= "if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, \"{$zppType}\"{$zppArgs}) == FAILURE) {return;}\n";
             if ($func->returnType != 'void') {
@@ -193,6 +201,8 @@ EOF;
                 return 'RETURN_DOUBLE(reckiretval);';
             case 'zend_bool':
                 return 'RETURN_BOOL(reckiretval);';
+            case 'reckistring':
+                return 'RETURN_STRINGL(reckiretval.string, reckiretval.length, 1);';
         }
         throw new \RuntimeException('Retval Type Not Implemented: ' . $type);
     }
@@ -201,7 +211,7 @@ EOF;
         switch ($type) {
             case 'long':
                 return 'l';
-            case 'char *':
+            case 'string':
                 return 's';
             case 'zend_bool':
                 return 'b';
@@ -214,7 +224,7 @@ EOF;
     protected function generateInternalFuncSignature($func) {
         $code = $func->returnType . " recki_if_{$func->name}(";
         foreach ($func->params as $param) {
-            $code .= $param[1] . ' ' . $param[0] . ', ';
+            $code .= $this->convertToCType($param[1]) . ' ' . $param[0] . ', ';
         }
         $code .= "int *validReturn)";
         return $code;
@@ -280,6 +290,10 @@ EOF;
                     $code .= "if (*validReturn != SUCCESS) { return; }\n";
                     break;
                 case 'functioncall':
+                    if ($func[$i][1] == 'strlen') {
+                        $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = ' . $scope[$func[$i][2]] . '.length;';
+                        break;
+                    }
                     $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = recki_if_' . $func[$i][1] . '(';
                     for ($j = 2; $j < count($func[$i]) - 1; $j++) {
                         $code .= $scope[$func[$i][$j]] . ', ';
@@ -322,7 +336,7 @@ EOF;
             case 'double':
                 return 'double';
             case 'string':
-                return 'char *';
+                return 'reckistring';
             case 'bool':
                 return 'zend_bool';
             case 'void':
@@ -345,10 +359,12 @@ EOF;
             case 'numeric';
             case 'int':
             case 'double':
-            case 'bool':
                 return $const[3];
+            case 'bool':
+                return (int) $const[3];
             case 'string':
-                return '\"' . addslashes(base64_decode($const[3])) . '\"';
+                $val = base64_decode($const[3]);
+                return '{"' . addslashes($val) . '", ' . strlen($val) . '}';
         }
         throw new \RuntimeException("Unknown constant type {$const[2]} with value {$const[3]}");
     }
