@@ -272,7 +272,7 @@ EOF;
                     $code .= 'if (!' . $scope[$func[$i][1]] . ') { goto ' . $this->convertToCLabel($func[$i][2]) . "; }\n";
                     break;
                 case 'recurse':
-                    $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = recki_if_' . $obj->name . '(';
+                    $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = recki_if_' . strtolower($obj->name) . '(';
                     for ($j = 1; $j < count($func[$i]) - 1; $j++) {
                         $code .= $scope[$func[$i][$j]] . ', ';
                     }
@@ -280,7 +280,7 @@ EOF;
                     $code .= "if (*validReturn != SUCCESS) { return; }\n";
                     break;
                 case 'functioncall':
-                    $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = recki_if_' . $func[$i][1] . '(';
+                    $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = recki_if_' . strtolower($func[$i][1]) . '(';
                     for ($j = 2; $j < count($func[$i]) - 1; $j++) {
                         $code .= $scope[$func[$i][$j]] . ', ';
                     }
@@ -345,8 +345,9 @@ EOF;
             case 'numeric';
             case 'int':
             case 'double':
-            case 'bool':
                 return $const[3];
+            case 'bool':
+                return (int) $const[3];
             case 'string':
                 return '\"' . addslashes(base64_decode($const[3])) . '\"';
         }
