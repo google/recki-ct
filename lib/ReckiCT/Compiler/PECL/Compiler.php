@@ -119,7 +119,9 @@ EOF;
         foreach ($funcs as $func) {
             $code .= 'static ' . $this->generateInternalFuncSignature($func) . "{\n{$func->code}\n}\n";
             $code .= "PHP_FUNCTION({$func->name}) {\n";
-            $code .= $func->returnType . " reckiretval;\n";
+            if ($func->returnType != 'void') {
+                $code .= $func->returnType . " reckiretval;\n";
+            }
             $code .= "int validReturn;\n";
             $zppType = '';
             $zppArgs = '';
@@ -131,9 +133,14 @@ EOF;
                 $callArgs .= $param[0] . ', ';
             }
             $code .= "if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, \"{$zppType}\"{$zppArgs}) == FAILURE) {return;}\n";
-            $code .= "reckiretval = recki_if_{$func->name}($callArgs &validReturn);\n";
-            $code .= "if (validReturn != SUCCESS) { return; }\n";
-            $code .= $this->generateRetvalStatement($func->returnType);
+            if ($func->returnType != 'void') {
+                $code .= "reckiretval = ";
+            }
+            $code .= "recki_if_{$func->name}($callArgs &validReturn);\n";
+            if ($func->returnType != 'void') {
+                $code .= "if (validReturn != SUCCESS) { return; }\n";
+                $code .= $this->generateRetvalStatement($func->returnType);
+            }
             $code .= "\n}\n";
 
         }
@@ -249,7 +256,11 @@ EOF;
                     break;
                 case 'return':
                     $code .= "*validReturn = SUCCESS;\n";
-                    $code .= 'return ' . $scope[$func[$i][1]] . ";\n";
+                    if (isset($func[$i][1])) {
+                        $code .= 'return ' . $scope[$func[$i][1]] . ";\n";
+                    } else {
+                        $code .= "return;\n";
+                    }
                     break;
                 case 'label':
                     $code .= $this->convertToCLabel($func[$i][1]) . ":\n";
@@ -263,6 +274,14 @@ EOF;
                 case 'recurse':
                     $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = recki_if_' . $obj->name . '(';
                     for ($j = 1; $j < count($func[$i]) - 1; $j++) {
+                        $code .= $scope[$func[$i][$j]] . ', ';
+                    }
+                    $code .= "validReturn);\n";
+                    $code .= "if (*validReturn != SUCCESS) { return; }\n";
+                    break;
+                case 'functioncall':
+                    $code .= $scope[$func[$i][count($func[$i]) - 1]] . ' = recki_if_' . $func[$i][1] . '(';
+                    for ($j = 2; $j < count($func[$i]) - 1; $j++) {
                         $code .= $scope[$func[$i][$j]] . ', ';
                     }
                     $code .= "validReturn);\n";
@@ -306,6 +325,8 @@ EOF;
                 return 'char *';
             case 'bool':
                 return 'zend_bool';
+            case 'void':
+                return 'void';
         }
         throw new \RuntimeException("Unsupported C Type $what");
     }
@@ -324,11 +345,12 @@ EOF;
             case 'numeric';
             case 'int':
             case 'double':
+            case 'bool':
                 return $const[3];
             case 'string':
                 return '\"' . addslashes(base64_decode($const[3])) . '\"';
         }
-        throw new \RuntimeException("Unknown constant type {$const[2]}");
+        throw new \RuntimeException("Unknown constant type {$const[2]} with value {$const[3]}");
     }
 
 }
