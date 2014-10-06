@@ -116,11 +116,11 @@ EOF;
         
         foreach ($funcs as $func) {
             $code .= "PHP_FUNCTION({$func->name});\n";
-            $code .= 'static ' . $this->generateInternalFuncSignature($func) . ";\n";
+            $code .= 'static inline ' . $this->generateInternalFuncSignature($func) . ";\n";
         }
         
         foreach ($funcs as $func) {
-            $code .= 'static ' . $this->generateInternalFuncSignature($func) . "{\n{$func->code}\n}\n";
+            $code .= 'static inline ' . $this->generateInternalFuncSignature($func) . "{\n{$func->code}\n}\n";
             $code .= "PHP_FUNCTION({$func->name}) {\n";
             if ($func->returnType != 'void') {
                 $code .= $func->returnType . " reckiretval;\n";
