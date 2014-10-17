@@ -133,7 +133,7 @@ class Compiler extends BaseCompiler
                 $var = $ctx->scope[$instruction[1]];
 
                 if (!isset($ctx->labels[$instruction[2]])) {
-                    $ctx->labels[$instruction[2]] = 'label_' . (count($ctx->labels) + 2);
+                    $ctx->labels[$instruction[2]] = 'label_' . (count($ctx->labels) + 1);
                 }
                 $ctx->function .= "if (!" . $var . ") { goto " . $ctx->labels[$instruction[2]] . "; }\n";
 
