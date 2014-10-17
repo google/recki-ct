@@ -31,6 +31,7 @@ use ReckiCT\Graph\Vertex\Function_ as JitFunction;
 use PhpParser\Node;
 use PhpParser\Node\Scalar;
 use PhpParser\Node\Expr\Variable as AstVariable;
+use PhpParser\Node\Stmt\Class_ as AstClass;
 use PhpParser\Node\Stmt\Function_ as AstFunction;
 use Gliph\Graph\DirectedAdjacencyList;
 
@@ -41,6 +42,11 @@ class Parser
     public function addRule(Rule $rule)
     {
         $this->rules[] = $rule;
+    }
+
+    public function parseClass(AstClass $ast)
+    {
+        throw new \BadMethodCallException("Not implemented yet");
     }
 
     public function parseFunction(AstFunction $ast)
