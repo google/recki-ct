@@ -96,7 +96,7 @@ Check out the `examples` folder for more examples!
 
 ## License
 
-Recki-CT is released under the [Apache-2 License](LICENCE).
+Recki-CT is released under the [Apache-2 License](LICENSE).
 
 ## Contributing
 
