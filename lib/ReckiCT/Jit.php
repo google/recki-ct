@@ -28,6 +28,9 @@ use PhpParser\NodeTraverser as AstTraverser;
 
 use PhpParser\NodeVisitor\NameResolver as AstNameResolver;
 
+use PhpParser\Node\Stmt\Use_ as AstUse;
+use PhpParser\Node\Stmt\Class_ as AstClass;
+use PhpParser\Node\Stmt\ClassMethod as AstClassMethod;
 use PhpParser\Node\Stmt\Function_ as AstFunction;
 use PhpParser\Node\Stmt\Namespace_ as AstNamespace;
 
@@ -107,6 +110,11 @@ class Jit
     protected $parsedIr = [];
 
     /**
+     * string[] An array of IR based on classname (cache)
+     */
+    protected $parsedClassIr = [];
+
+    /**
      * Compile a function using the JITFU compiler
      *
      * @param string $name The function to compile
@@ -178,6 +186,26 @@ class Jit
     }
 
     /**
+     * Get the AST representation of a given class name, analyzed
+     *
+     * @param string $name The class name to find the AST for
+     *
+     * @return \PhpParser\Node\Stmt\Class_|null The function if found
+     */
+    public function getClassAst($name)
+    {
+        if (!class_exists($name)) {
+            return;
+        }
+        $r = new \ReflectionClass($name);
+        $file = $this->parseFile($r->getFilename());
+        $node = $this->findClass($r->getName(), $file);
+        if ($node) {
+            return $node;
+        }
+    }
+
+    /**
      * Get the graph representation of a given function name, analyzed
      *
      * @param string $name The function name to find the CFG for
@@ -212,8 +240,54 @@ class Jit
                 $this->parsedIr[$name] = false;
             }
         }
-
         return $this->parsedIr[$name];
+    }
+
+    /**
+     * Get the IR representation of a given class name, if found
+     *
+     * @param string $name The class name to find the IR for
+     *
+     * @return string|false The class's IR if found, or false
+     */
+    public function getClassIR($name)
+    {
+        if (!isset($this->parsedClassIr[$name])) {
+            $ast = $this->getClassAst($name);
+            $class = $this->parser->parseClass($ast);
+            $this->analyzer->analyzeClass($class);
+            $this->parsedClassIr[$name] = $this->generator->generateClass($name, $class);
+        }
+        return $this->parsedClassIr[$name];
+    }
+
+    public function getFileIr($filename) {
+        $ast = $this->parseFile($filename);
+        $ir = $this->getIrFromAstArray($ast);
+        var_dump($ir);
+        die();
+    }
+
+    protected function getIrFromAstArray(array $ast) {
+        $ir = '';
+        foreach ($ast as $node) {
+            switch (get_class($node)) {
+                case AstNamespace::class:
+                    $ir .= "\n" . $this->getIrFromAstArray($node->stmts);
+                    break;
+                case AstUse::class:
+                    break;
+                case AstFunction::class:
+                    $ir .= "\n" . $this->getFunctionIR($node->namespacedName->toString());
+                    break;
+                case AstClass::class:
+                    $ir .= "\n" . $this->getClassIr($node->namespacedName->toString());
+                    break;
+                default:
+                    throw new \RuntimeException("Unsupported statements found in file: " . get_class($node));
+            }
+        }
+        return $ir;
     }
 
     /**
@@ -317,4 +391,27 @@ class Jit
         }
     }
 
+    /**
+     * Given an AST array, find a named class's definition
+     *
+     * @param string            $name The class name to find
+     * @param \PhpParser\Node[] $ast  The file's AST
+     *
+     * @return \PhpParser\Node\Stmt\Class_|null The found class's node or null
+     */
+    public function findClass($name, array $ast)
+    {
+        foreach ($ast as $node) {
+            if ($node instanceof AstNamespace) {
+                $test = $this->findFunction($name, $node->stmts);
+                if ($test) {
+                    return $test;
+                }
+            } elseif ($node instanceof AstClass) {
+                if ($name === (string) $node->namespacedName) {
+                    return $node;
+                }
+            }
+        }
+    }
 }
