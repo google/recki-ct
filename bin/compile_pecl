@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * Copyright 2014 Google Inc. All rights reserved.
@@ -16,35 +17,13 @@
  *
  * @copyright 2014 Google Inc. All rights reserved
  * @license http://www.apache.org/licenses/LICENSE-2.0.txt Apache-2.0
- * @package Compiler
- * @subpackage PECL
+ * @package Main
  */
 
-namespace ReckiCT\Compiler\PECL;
+require_once __DIR__ . '/../vendor/autoload.php';
 
-use ReckiCT\Jit;
-use ReckiCT\Compiler\Compiler as BaseCompiler;
+$app = new \Cilex\Application("Recki-CT Compiler");
 
-class Compiler extends BaseCompiler
-{
+$app->command(new ReckiCT_Cli\Command\CompileCommand);
 
-
-    public function convertToCallable(array $instructions) {
-        throw new \BadMethodCallException("Not implemented");
-    }
-
-    public function compile($ir, $name)
-    {
-        $instructions = $this->parseIr($ir);
-        $functions = $this->separateIrToFunctions($instructions);
-
-        $module = new Module($name);
-
-        foreach ($functions as $name => $func) {
-            $obj = new Function_($name, $func);
-            $module->addFunction($obj);
-        }
-        return $module->compile();
-    }
-
-}
+$app->run();

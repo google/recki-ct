@@ -23,7 +23,8 @@
         "php-64bit": ">=5.5.0",
         "nikic/php-parser": "1.0.*@dev",
         "phpdocumentor/reflection-docblock": "2.0.*",
-        "sdboyer/gliph": "0.7.*"
+        "sdboyer/gliph": "0.7.*",
+        "cilex/cilex": "1.1.*"
     },
 
     "require-dev": {
@@ -37,7 +38,8 @@
 
     "autoload": {
         "psr-4": {
-            "ReckiCT\\": "lib/ReckiCT/"
+            "ReckiCT\\": "lib/ReckiCT/",
+            "ReckiCT_Cli\\": "lib/ReckiCT_Cli/"
         }
     },
 
