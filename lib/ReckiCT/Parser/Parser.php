@@ -21,6 +21,7 @@
 
 namespace ReckiCT\Parser;
 
+use ReckiCT\Graph\Class_;
 use ReckiCT\Graph\Vertex;
 use ReckiCT\Graph\Variable as JitVariable;
 use ReckiCT\Graph\Constant as JitConstant;
@@ -32,6 +33,7 @@ use PhpParser\Node;
 use PhpParser\Node\Scalar;
 use PhpParser\Node\Expr\Variable as AstVariable;
 use PhpParser\Node\Stmt\Class_ as AstClass;
+use PhpParser\Node\Stmt\ClassMethod as AstClassMethod;
 use PhpParser\Node\Stmt\Function_ as AstFunction;
 use Gliph\Graph\DirectedAdjacencyList;
 
@@ -46,7 +48,26 @@ class Parser
 
     public function parseClass(AstClass $ast)
     {
-        throw new \BadMethodCallException("Not implemented yet");
+        var_dump($ast);
+        $implements = [];
+        foreach ($ast->implements as $interface) {
+            $implements[] = $interface->toString();
+        }
+        $class = new Class_(
+            $ast->namespacedName->toString(),
+            $ast->extends ? $ast->extends->toString() : null,
+            $implements
+        );
+
+        foreach ($ast->stmts as $stmt) {
+            switch (get_class($stmt)) {
+                case AstClassMethod::class:
+                    break;
+                default:
+                    throw new \LogicException("Unexpected child type found: " . get_class($stmt));
+            }
+        }
+        return $class;
     }
 
     public function parseFunction(AstFunction $ast)
