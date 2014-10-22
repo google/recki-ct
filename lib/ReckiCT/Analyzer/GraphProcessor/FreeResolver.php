@@ -39,7 +39,7 @@ class FreeResolver implements GraphProcessor
     public function process(GraphState $state)
     {
         $graph = $state->getGraph();
-        $vars = Helper::findVariables($graph);
+        $vars = Helper::findVariables($graph, true);
         $postdominator = $state->getPostDominator();
         $dominator = $state->getDominator();
 

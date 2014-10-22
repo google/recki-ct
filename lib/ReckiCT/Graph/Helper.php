@@ -142,12 +142,12 @@ class Helper
         return $result;
     }
 
-    public static function findVariables(Digraph $graph)
+    public static function findVariables(Digraph $graph, $includeConstants = false)
     {
         $vars = new \SplObjectStorage();
         foreach ($graph->vertices() as $vertex) {
             foreach ($vertex->getVariables() as $var) {
-                if (!$var instanceof Constant) {
+                if ($includeConstants || !$var instanceof Constant) {
                     $vars->attach($var);
                 }
             }
