@@ -36,7 +36,7 @@ class CompileCommand extends Command {
     protected function configure() {
         $this->setName('compile')
             ->setDescription('Compile a file or series of files')
-            ->addOption('optimize', 'O', InputOption::VALUE_OPTIONAL, "Optimize the compile?", null)
+            ->addOption('optimize', 'O', InputOption::VALUE_NONE, "Optimize the compile?", null)
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the module to compile')
             ->addArgument('files', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The files to compile');
     }
@@ -51,20 +51,22 @@ class CompileCommand extends Command {
         }
         $name = $input->getArgument("name");
         $lname = strtolower($name);
-        $files = $compiler->compile($ir, $name);
+        $files = $compiler->compile(trim($ir), $name);
 
         $dir = $this->makeTempDir();
         foreach ($files as $fname => $file) {
             file_put_contents($dir . '/' . $fname, $file);
         }
 
-        $command = "(cd $dir; phpize && ./configure && make)"; 
+        $opt = $input->getOption("optimize") ? "-O3" : "";
+
+        $command = "(cd $dir; phpize && CFLAGS=\"\$CFLAGS $opt\" ./configure && make)"; 
         passthru($command, $retval);
         if ($retval) {
             throw new \RuntimeException("There was an error: $retval");
         }
-        rename("$dir/$lname.so", getcwd() . "/$lname.so");
-        echo "\nGenerated $lname.so";
+        rename("$dir/modules/$lname.so", getcwd() . "/$lname.so");
+        echo "\nGenerated $lname.so\n";
     }
 
     protected function makeTempDir() {

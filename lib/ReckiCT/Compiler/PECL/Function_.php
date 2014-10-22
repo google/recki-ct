@@ -54,7 +54,7 @@ class Function_
     }
 
     public function getArgInfo() {
-        $code = "ZEND_BEGIN_ARG_INFO_EX(arginfo_{$this->name}, 0, 0, " . count($func->params) . ")\n";
+        $code = "ZEND_BEGIN_ARG_INFO_EX(arginfo_{$this->name}, 0, 0, " . count($this->params) . ")\n";
         foreach ($this->params as $param) {
             $code .= "\tZEND_ARG_INFO(0, {$param[0]})\n";
         }

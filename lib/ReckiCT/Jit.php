@@ -209,12 +209,15 @@ class Jit
      * Get the graph representation of a given function name, analyzed
      *
      * @param string $name The function name to find the CFG for
+     * @param PhpParser\Node\Stmt\Function_ $node The optional node to pass along
      *
      * @return \ReckiCT\Graph\Vertex\Function_|null The function if found
      */
-    public function getFunctionGraph($name)
+    public function getFunctionGraph($name, AstFunction $node = null)
     {
-        $node = $this->getFunctionAst($name);
+        if (!$node) {
+            $node = $this->getFunctionAst($name);
+        }
         if ($node) {
             $graph = $this->parser->parseFunction($node);
             $this->analyzer->analyzeGraph($graph);
@@ -227,13 +230,14 @@ class Jit
      * Get the IR representation of a given function name, if found
      *
      * @param string $name The function name to find the IR for
+     * @param PhpParser\Node\Stmt\Function_ $node The optional node to pass along
      *
      * @return string|false The function's IR if found, or false
      */
-    public function getFunctionIR($name)
+    public function getFunctionIR($name, AstFunction $node = null)
     {
         if (!isset($this->parsedIr[$name])) {
-            $graph = $this->getFunctionGraph($name);
+            $graph = $this->getFunctionGraph($name, $node);
             if ($graph) {
                 $this->parsedIr[$name] = $this->generator->generateFunction($name, $graph);
             } else {
@@ -264,8 +268,7 @@ class Jit
     public function getFileIr($filename) {
         $ast = $this->parseFile($filename);
         $ir = $this->getIrFromAstArray($ast);
-        var_dump($ir);
-        die();
+        return trim($ir);
     }
 
     protected function getIrFromAstArray(array $ast) {
@@ -278,7 +281,7 @@ class Jit
                 case AstUse::class:
                     break;
                 case AstFunction::class:
-                    $ir .= "\n" . $this->getFunctionIR($node->namespacedName->toString());
+                    $ir .= "\n" . $this->getFunctionIR($node->namespacedName->toString(), $this->analyzer->analyzeFunction($node));
                     break;
                 case AstClass::class:
                     $ir .= "\n" . $this->getClassIr($node->namespacedName->toString());
