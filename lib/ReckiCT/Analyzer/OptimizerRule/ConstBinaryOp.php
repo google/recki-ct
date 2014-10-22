@@ -42,6 +42,9 @@ class ConstBinaryOp implements OptimizerRule
         if ($vertex instanceof JitBinaryOp && $vertex->getA() instanceof Constant && $vertex->getB() instanceof Constant) {
             $ret = null;
             switch ($vertex->getKind()) {
+                case JitBinaryOp::CONCAT:
+                    $ret = $vertex->getA()->getValue() . $vertex->getB()->getValue();
+                    break;
                 case JitBinaryOp::PLUS:
                     $ret = $vertex->getA()->getValue() + $vertex->getB()->getValue();
                     break;

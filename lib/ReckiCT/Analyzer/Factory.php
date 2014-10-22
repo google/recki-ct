@@ -53,6 +53,8 @@ class Factory
 
         $analyzer->addProcessor(new GraphProcessor\PhiResolver());
 
+        $analyzer->addProcessor(new GraphProcessor\FreeResolver());
+
         return $analyzer;
     }
 

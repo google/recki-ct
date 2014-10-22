@@ -31,6 +31,7 @@ use PhpParser\Node;
 
 use ReckiCT\Graph\Vertex\BinaryOp as JitOp;
 
+use PhpParser\Node\Expr\BinaryOp\Concat;
 use PhpParser\Node\Expr\BinaryOp\Plus;
 use PhpParser\Node\Expr\BinaryOp\Minus;
 use PhpParser\Node\Expr\BinaryOp\Mul;
@@ -53,6 +54,8 @@ use PhpParser\Node\Expr\BinaryOp\ShiftRight;
 class BinaryOp implements Rule
 {
     protected static $map = [
+        Concat::class => JitOp::CONCAT,
+
         Plus::class     => JitOp::PLUS,
         Minus::class    => JitOp::MINUS,
         Mul::class      => JitOp::MUL,
@@ -61,7 +64,7 @@ class BinaryOp implements Rule
 
         Equal::class        => JitOp::EQUAL,
         NotEqual::class     => JitOp::NOT_EQUAL,
-        Identical::class     => JitOp::IDENTICAL,
+        Identical::class    => JitOp::IDENTICAL,
         NotIdentical::class => JitOp::NOT_IDENTICAL,
 
         Greater::class          => JitOp::GREATER,

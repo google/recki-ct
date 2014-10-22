@@ -137,6 +137,46 @@ class Dominator
     }
 
     /**
+     * Find the immediate dominator of a set of vertices
+     *
+     * The idom is the unique dominator of the vertex which dominates
+     * no other dominator of the vertex.
+     *
+     * @param Vertex[] $vertices The vertex
+     *
+     * @return mixed The vertex or null if no idom exists
+     */
+    public function immediateDominatorArray(array $vertices)
+    {
+        $idoms = [];
+        foreach ($vertices as $vertex) {
+            $idoms[] = $this->immediateDominator($vertex);
+        }
+        while (!empty($idoms)) {
+            $idoms = array_filter(Shim::array_unique($idoms));
+            $toremove = [];
+            foreach ($idoms as $k => $v1) {
+                foreach ($idoms as $v2) {
+                    if ($this->strictlyDominates($v1, $v2)) {
+                        $toremove[] = $k;
+                    }
+                }
+            }
+            foreach ($toremove as $k) {
+                unset($idoms[$k]);
+            }
+            if (count($idoms) === 1) {
+                return reset($idoms);
+            }
+            $newidoms = [];
+            foreach ($idoms as $idom) {
+                $newidoms[] = $this->immediateDominator($idom);
+            }
+            $idoms = $newidoms;
+        }
+    }
+
+    /**
      * Get the dominance frontier of a vertex
      *
      * The frontier is the set of vertices where the Vertex $a dominates

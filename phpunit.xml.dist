@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="true"
-         backupStaticAttributes="true"
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
          bootstrap="vendor/autoload.php"
          colors="true"
          convertErrorsToExceptions="true"

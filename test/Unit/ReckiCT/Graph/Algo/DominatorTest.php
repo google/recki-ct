@@ -118,6 +118,33 @@ class DominatorTest extends TestCase
     }
 
     /**
+     * @covers ::immediateDominatorArray
+     */
+    public function testImmediateDominatorArray()
+    {
+        $dominator = new Dominator($this->graph, $this->func);
+        $this->assertSame($this->v[1], $dominator->immediateDominatorArray([$this->v[2], $this->v[3]]));
+        $this->assertSame($this->v[1], $dominator->immediateDominatorArray([$this->v[2], $this->v[4]]));
+        $this->assertSame($this->v[0], $dominator->immediateDominatorArray([$this->v[1], $this->v[4]]));
+    }
+
+    /**
+     * @depends testImmediateDominatorArray
+     * @covers ::immediateDominatorArray
+     *
+     *       /---\
+     *      /  2  \
+     * 0 - 1 <   > 4 - 5    
+     *         3
+     */
+    public function testImmediateDominatorArrayCycles()
+    {
+        $this->graph->ensureArc($this->v[4], $this->v[1]);
+        $dominator = new Dominator($this->graph, $this->func);
+        $this->assertSame($this->v[1], $dominator->immediateDominatorArray([$this->v[2], $this->v[3]]));
+    }
+
+    /**
      * @depends testStrictlyDominates
      * @covers ::getFrontier
      *

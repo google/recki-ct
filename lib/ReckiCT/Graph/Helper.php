@@ -42,6 +42,19 @@ class Helper
         }
     }
 
+    public static function insertBefore(Vertex $old, Vertex $new, Digraph $graph)
+    {
+        $toRemove = array();
+        foreach ($graph->predecessorsOf($old) as $node) {
+            $graph->ensureArc($node, $new);
+            $toRemove[] = $node;
+        }
+        $graph->ensureArc($new, $old);
+        foreach ($toRemove as $node) {
+            $graph->removeArc($node, $old);
+        }
+    }
+
     public static function replace(Vertex $old, Vertex $new, Digraph $graph)
     {
         foreach (self::getInboundNodes($old, $graph) as $n1) {

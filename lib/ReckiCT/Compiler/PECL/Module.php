@@ -56,11 +56,54 @@ class Module
 #endif
 #include "php.h"
 #include "php_{$this->name}.h"
+#include <stdint.h>
 
-typedef struct _reckistring {
-    char *string;
-    int length;
-} reckistring;
+#if PHP_VERSION_ID >= 70000
+#define reckistring zend_string
+#define recki_string_init zend_string_init
+#define recki_string_copy zend_string_copy
+#else
+#define reckistring recki_string
+
+
+#define _STR_HEADER_SIZE XtOffsetOf(recki_string, val)
+
+#define IS_STR_PERSISTENT 1<<0
+
+#define GC_REFCOUNT(p)  ((recki_refcounted*)(p))->refcount
+#define GC_TYPE(p)  ((recki_refcounted*)(p))->u.v.type
+#define GC_FLAGS(p)  ((recki_refcounted*)(p))->u.v.flags
+#define GC_INFO(p)  ((recki_refcounted*)(p))->u.v.gc_info
+#define GC_TYPE_INFO(p)  ((recki_refcounted*)(p))->u.type_info
+
+zend_always_inline void recki_string_release(recki_string *s) {
+    if (--GC_REFCOUNT(s) == 0) {
+        pefree(s, GC_FLAGS(s) & IS_STR_PERSISTENT);
+    }
+}
+
+zend_always_inline recki_string *recki_string_copy(recki_string *s) {
+    GC_REFCOUNT(s)++;
+    return s;
+}
+
+zend_always_inline recki_string *recki_string_alloc(size_t len, int persistent) {
+    recki_string *ret = (recki_string*) pemalloc(ZEND_MM_ALIGNED_SIZE(_STR_HEADER_SIZE + len + 1), persistent);
+    GC_REFCOUNT(ret) = 1;
+    GC_TYPE_INFO(ret) = IS_STRING | ((persistent ? IS_STR_PERSISTENT : 0) << 8);
+    ret->h = 0;
+    ret->len = len;
+    return ret;
+}
+
+zend_always_inline recki_string *recki_string_init(const char *str, size_t len, int persistent) {
+    recki_string *ret = recki_string_alloc(len, persistent);
+    memcpy(ret->val, str, len);
+    ret->val[len] = '\\0';
+    return ret;
+}
+
+#endif
 
 EOF;
 
@@ -146,6 +189,37 @@ EOF;
 #define PHP_{$upperName}_H 1
 #define PHP_{$upperName}_VERSION "1.0"
 #define PHP_{$upperName}_EXTNAME "{$this->name}"
+
+
+# define RECKI_ENDIAN_LOHI_3(lo, mi, hi)    lo; mi; hi;
+
+#ifndef uint32_t
+typedef unsigned int uint32_t;
+#endif
+
+#ifndef uint16_t
+typedef unsigned short int uint16_t;
+#endif
+
+typedef struct _recki_refcounted {
+    uint32_t    refcount;
+    union {
+        struct {
+            RECKI_ENDIAN_LOHI_3(
+                zend_uchar  type,
+                zend_uchar  flags,
+                uint16_t    gc_info)
+        } v;
+        uint32_t type_info;
+    } u;
+} recki_refcounted;
+
+typedef struct _recki_string {
+    recki_refcounted gc;
+    zend_ulong       h;
+    size_t           len;
+    char             val[1];
+} recki_string;
 
 extern zend_module_entry {$this->name}_module_entry;
 

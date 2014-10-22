@@ -104,22 +104,41 @@ class Function_
         }
         $code .= "\tint validReturn;\n";
 
-        $zppType = '';
-        $zppArgs = '';
+        $zppType_5 = '';
+        $zppArgs_5 = '';
+        $zppType_7 = '';
+        $zppArgs_7 = '';
         $callArgs = '';
+        
+        $code_5 = "";
+        $post_5 = "";
         foreach ($this->params as $param) {
             $code .= "\t" . $this->convertToCType($param[1]) . ' ' . $param[0] . ";\n";
-            $zppType .= $this->getZppFromType($param[1]);
+            $zppType = $this->getZppFromType($param[1]);
 
             $callArgs .= $param[0] . ', ';
             if ($zppType == 's') {
-                $zppArgs .= ', &' . $param[0] . '.string, &' . $param[0] . '.length';
-            } else {
-                $zppArgs .= ', &' . $param[0];
-            }
+                $zppType_7 .= 'S';
+                $zppArgs_7 .= ', &' . $param[0];
 
+                $code_5 .= "\t" . 'char *' . $param[0] . "_val;\n";
+                $code_5 .= "\t" . 'int ' . $param[0] . "_len;\n";
+                $post_5 .= "\t" . $param[0] . ' = recki_string_init(' . $param[0] . '_val, (size_t) ' . $param[0] . "_len, 0);\n";
+                $zppType_5 .= 's';
+                $zppArgs_5 .= ', &' . $param[0] . "_val, &" . $param[0] . "_len";
+            } else {
+                $zppType_5 .= $zppType;
+                $zppType_7 .= $zppType;
+                $zppArgs_5 .= ', &' . $param[0];
+                $zppArgs_7 .= ', &' . $param[0];
+            }
         }
-        $code .= "\tif (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, \"{$zppType}\"{$zppArgs}) == FAILURE) {\n\t\treturn;\n\t}\n";
+        $code .= "#if PHP_VERSION_ID >= 70000\n";
+        $code .= "\tif (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, \"{$zppType_7}\"{$zppArgs_7}) == FAILURE) {\n\t\treturn;\n\t}\n";
+        $code .= "#else\n$code_5";
+        $code .= "\tif (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, \"{$zppType_5}\"{$zppArgs_5}) == FAILURE) {\n\t\treturn;\n\t}\n";
+        $code .= "$post_5";
+        $code .= "#endif\n";
         if ($this->returnType != 'void') {
             $code .= "\treckiretval = ";
         }
@@ -142,6 +161,7 @@ class Function_
         }
         
         $vars = [];
+        $string_constants = '';
         $count = count($ir);
         while (++$i < $count) {
             $instruction = $ir[$i];
@@ -151,17 +171,38 @@ class Function_
                     if ($instruction[2] === 'void') break;
                     $scope[$instruction[1]] = $this->convertToCLabel($instruction[1]);
                     $vars[$scope[$instruction[1]]] = $this->convertToCType($instruction[2]);
-
                     break;
                 case 'const':
-                    $scope[$instruction[1]] = $this->printConstant($instruction);
+                    if ($instruction[2] == "string") {
+                        $scope[$instruction[1]] = $this->convertToCLabel($instruction[1]);
+                        $vars[$scope[$instruction[1]]] = $this->convertToCType($instruction[2]);
+                        $string_constants .= $scope[$instruction[1]] . ' = ' . $this->printConstant($instruction) . ";\n";
+                    } else {
+                        $scope[$instruction[1]] = $this->printConstant($instruction);
+                    }
                     break;
-
+                case 'free':
+                    if (isset($vars[$scope[$instruction[1]]]) && $vars[$scope[$instruction[1]]] === "reckistring *") {
+                        $code .= "recki_string_release(" . $scope[$instruction[1]] . ");\n";
+                    }
+                    break;
                 case '~':
+                    if ($vars[$scope[$instruction[2]]] === "reckistring *") {
+                        throw new \RuntimeException("Negatting strings, hurts");
+                    }
                 case '!':
+                    if ($vars[$scope[$instruction[2]]] === "reckistring *") {
+                        throw new \RuntimeException("Notting strings, hurts");
+                    }
                     $prefix = $instruction[0];
                 case 'assign':
-                    $code .= $scope[$instruction[2]] . '= ' . $prefix . $scope[$instruction[1]] . ";\n";
+                    $v = $scope[$instruction[2]];
+                    if ($vars[$scope[$instruction[2]]] === "reckistring *") {
+                        $code .= "if ($v != NULL) {\n\trecki_string_release($v);\n}\n";
+                        $code .= $scope[$instruction[2]] . ' = recki_string_copy(' . $scope[$instruction[1]] . ");\n";
+                    } else {
+                        $code .= $scope[$instruction[2]] . ' = ' . $prefix . $scope[$instruction[1]] . ";\n";
+                    }
                     break;
                 case 'return':
                     $code .= "*validReturn = SUCCESS;\n";
@@ -220,10 +261,20 @@ class Function_
                 case '>=':
                     $code .= $scope[$instruction[3]] . '=' . $scope[$instruction[1]] . $instruction[0] . $scope[$instruction[2]] . ";\n";
                     break;
+                case '.':
+                    $v = $scope[$instruction[3]];
+                    $l = $scope[$instruction[1]];
+                    $r = $scope[$instruction[2]];
+                    $code .= "{$v} = recki_string_alloc({$l}->len + {$r}->len, 0);
+memcpy({$v}->val, {$l}->val, {$l}->len);
+memcpy({$v}->val + {$l}->len, {$r}->val, {$r}->len);
+{$v}->val[{$v}->len] = '\\0';\n";
+                    break;
                 default:
                     throw new \RuntimeException("Unsupported compiler operation {$instruction[0]}");
             }
         }
+        $code = $string_constants . $code;
         // Generate variable declarations
         foreach ($vars as $name => $type) {
             $code = $type . ' ' . $name . ";\n" . $code;
@@ -239,7 +290,7 @@ class Function_
             case 'double':
                 return 'double';
             case 'string':
-                return 'reckistring';
+                return 'reckistring *';
             case 'bool':
                 return 'zend_bool';
             case 'void':
@@ -267,7 +318,7 @@ class Function_
                 return (int) $const[3];
             case 'string':
                 $val = base64_decode($const[3]);
-                return '((reckistring){"' . addslashes($val) . '", ' . strlen($val) . '})';
+                return 'recki_string_init("' . addslashes($val) . '", ' . strlen($val) . ', 0)';
         }
         throw new \RuntimeException("Unknown constant type {$const[2]} with value {$const[3]}");
     }
@@ -280,8 +331,15 @@ class Function_
                 return 'RETURN_DOUBLE(reckiretval);';
             case 'zend_bool':
                 return 'RETURN_BOOL(reckiretval);';
-            case 'reckistring':
-                return 'RETURN_STRINGL(reckiretval.string, reckiretval.length, 1);';
+            case 'reckistring *':
+                return "
+#if PHP_VERSION_ID >= 70000
+    RETURN_STR(reckiretval);
+#else
+    RETVAL_STRINGL(reckiretval->val, reckiretval->len, 1);
+    recki_string_release(reckiretval);
+    return;
+#endif\n";
         }
         throw new \RuntimeException('Retval Type Not Implemented: ' . $type);
     }

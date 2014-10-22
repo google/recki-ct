@@ -43,6 +43,9 @@ class BinaryOp implements OptimizerRule
             $typePair = [$vertex->getA()->getType()->getType(), $vertex->getB()->getType()->getType()];
             $newType = Type::TYPE_UNKNOWN;
             switch ($vertex->getKind()) {
+                case JitBinaryOp::CONCAT:
+                    $newType = Type::TYPE_STRING;
+                    break;
                 case JitBinaryOp::PLUS:
                 case JitBinaryOp::MINUS:
                 case JitBinaryOp::MUL:

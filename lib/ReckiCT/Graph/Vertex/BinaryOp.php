@@ -31,6 +31,8 @@ class BinaryOp extends Vertex implements Assignment
 {
     use Traits\Assignment;
 
+    const CONCAT = '.';
+
     const PLUS = '+';
     const MINUS = '-';
     const MUL = '*';
