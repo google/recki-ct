@@ -231,7 +231,7 @@ class Function_
                     break;
                 case 'functioncall':
                     if ($instruction[1] == 'strlen') {
-                        $code .= $scope[$instruction[count($instruction) - 1]] . ' = ' . $scope[$instruction[2]] . '.length;';
+                        $code .= $scope[$instruction[count($instruction) - 1]] . ' = ' . $scope[$instruction[2]] . "->len;\n";
                         break;
                     }
                     if (isset($scope[$instruction[count($instruction) - 1]])) {
@@ -318,7 +318,10 @@ memcpy({$v}->val + {$l}->len, {$r}->val, {$r}->len);
                 return (int) $const[3];
             case 'string':
                 $val = base64_decode($const[3]);
-                return 'recki_string_init("' . addslashes($val) . '", ' . strlen($val) . ', 0)';
+                $val_encoded = preg_replace_callback("([^a-zA-Z0-9])", function($x) {
+                    return '\x' . str_pad(dechex(ord($x[0])), 2, '0', STR_PAD_LEFT);
+                }, $val);
+                return 'recki_string_init("' . $val_encoded . '", ' . strlen($val) . ', 0)';
         }
         throw new \RuntimeException("Unknown constant type {$const[2]} with value {$const[3]}");
     }
