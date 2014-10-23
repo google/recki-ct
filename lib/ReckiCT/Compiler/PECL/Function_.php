@@ -182,8 +182,8 @@ class Function_
                     }
                     break;
                 case 'free':
-                    if (isset($vars[$scope[$instruction[1]]]) && $vars[$scope[$instruction[1]]] === "reckistring *") {
-                        $code .= "recki_string_release(" . $scope[$instruction[1]] . ");\n";
+                    if (isset($scope[$instruction[1]]) && isset($vars[$scope[$instruction[1]]]) && $vars[$scope[$instruction[1]]] === "reckistring *") {
+                        //$code .= "recki_string_release(" . $scope[$instruction[1]] . ");\n";
                     }
                     break;
                 case '~':
@@ -222,7 +222,7 @@ class Function_
                     $code .= 'if (!' . $scope[$instruction[1]] . ') { goto ' . $this->convertToCLabel($instruction[2]) . "; }\n";
                     break;
                 case 'recurse':
-                    $code .= $scope[$instruction[count($instruction) - 1]] . ' = recki_if_' . strtolower($obj->name) . '(';
+                    $code .= $scope[$instruction[count($instruction) - 1]] . ' = recki_if_' . strtolower($this->name) . '(';
                     for ($j = 1; $j < count($instruction) - 1; $j++) {
                         $code .= $scope[$instruction[$j]] . ', ';
                     }
@@ -265,7 +265,11 @@ class Function_
                     $v = $scope[$instruction[3]];
                     $l = $scope[$instruction[1]];
                     $r = $scope[$instruction[2]];
-                    $code .= "{$v} = recki_string_alloc({$l}->len + {$r}->len, 0);
+                    $code .= "
+if ({$v} == NULL) {
+    {$v} = recki_string_alloc({$l}->len + {$r}->len, 0);
+}
+{$v} = recki_string_realloc({$v}, {$l}->len + {$r}->len, 0);
 memcpy({$v}->val, {$l}->val, {$l}->len);
 memcpy({$v}->val + {$l}->len, {$r}->val, {$r}->len);
 {$v}->val[{$v}->len] = '\\0';\n";

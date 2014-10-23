@@ -103,6 +103,19 @@ zend_always_inline recki_string *recki_string_init(const char *str, size_t len, 
     return ret;
 }
 
+zend_always_inline recki_string *recki_string_realloc(recki_string *s, size_t len, int persistent) {
+    recki_string *ret;
+    if (EXPECTED(GC_REFCOUNT(s) == 1)) {
+        ret = (recki_string*) perealloc(s, ZEND_MM_ALIGNED_SIZE(_STR_HEADER_SIZE + len + 1), persistent);
+        ret->len = len;
+    } else {
+        ret = recki_string_alloc(len, persistent);
+        memcpy(ret->val, s->val, (len > s->len ? s->len : len) + 1);
+        GC_REFCOUNT(s)--;
+    }
+    return ret;
+}
+
 #endif
 
 EOF;

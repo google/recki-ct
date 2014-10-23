@@ -113,6 +113,9 @@ class Compiler extends BaseCompiler
     public function compileInstruction(array $instruction, \StdClass $ctx)
     {
         switch ($instruction[0]) {
+            case 'free':
+                // ignore free statements
+                return;
             case 'const':
                 $value = null;
                 switch ($instruction[2]) {
