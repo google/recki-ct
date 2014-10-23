@@ -35,9 +35,17 @@ class Generator
             'labelidx' => 0,
             'seen' => new \SplObjectStorage(),
             'graph' => $func->getGraph(),
+            'constants' => [],
         ];
 
-        return 'function ' . $name . ' ' . $func->getReturnType() . "\n" . $this->generate($func, $state) . "end";
+        $body = $this->generate($func, $state);
+        $replace = "";
+        if ($state->constants) {
+            $replace = implode("\n", $state->constants) . "\n";
+        }
+        $body = str_replace("--constants--\n", $replace, $body);
+
+        return 'function ' . $name . ' ' . $func->getReturnType() . "\n" . $body . "end";
     }
 
     public function generate(Vertex $vertex, \StdClass $state)
@@ -97,7 +105,7 @@ class Generator
                 return '';
             }
         } elseif ($vertex instanceof Vertex\Function_) {
-            return $varStub . 'begin';
+            return $varStub . "begin\n--constants--";
         } elseif ($vertex instanceof Vertex\FunctionCall) {
             if ($vertex->isSelfRecursive()) {
                 $output = 'recurse';
@@ -126,7 +134,7 @@ class Generator
                     if ('string' == (string) $var->getType()) {
                         $value = base64_encode($value);
                     }
-                    $varStub .= 'const $' . $state->scope[$var] . ' ' . $var->getType() . ' ' . $value . "\n";
+                    $state->constants[] = 'const $' . $state->scope[$var] . ' ' . $var->getType() . ' ' . $value;
                 } elseif ($vertex instanceof Vertex\Function_) {
                     $varStub .= 'param $' . $state->scope[$var] . ' ' . $var->getType() . "\n";
                 } else {

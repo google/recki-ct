@@ -31,9 +31,11 @@ class Function_
     protected $params = [];
     protected $returnType;
     protected $code;
+    protected $module;
 
-    public function __construct($name, array $ir) {
+    public function __construct($name, array $ir, Module $module) {
         $this->name = $name;
+        $this->module = $module;
         $this->compile($ir);
     }
 
@@ -155,13 +157,19 @@ class Function_
         $code = '';
         $i = 1;
         $scope = [];
+        $params = [];
+        $vars = [];
         while ('begin' != $ir[$i][0]) {
             $scope[$ir[$i][1]] = $this->convertToCLabel($ir[$i][1]);
+            $vars[$scope[$ir[$i][1]]] = $this->convertToCType($ir[$i][2]);
+            $params[$scope[$ir[$i][1]]] = true;
             $i++;
         }
         
-        $vars = [];
+        
+        $string_frees = '';
         $string_constants = '';
+        $vars_to_increment_on_return = [];
         $count = count($ir);
         while (++$i < $count) {
             $instruction = $ir[$i];
@@ -177,13 +185,16 @@ class Function_
                         $scope[$instruction[1]] = $this->convertToCLabel($instruction[1]);
                         $vars[$scope[$instruction[1]]] = $this->convertToCType($instruction[2]);
                         $string_constants .= $scope[$instruction[1]] . ' = ' . $this->printConstant($instruction) . ";\n";
+                        $string_constants .= "GC_REFCOUNT(" . $scope[$instruction[1]] . ")++;\n";
+                        $string_frees .= "GC_REFCOUNT(" . $scope[$instruction[1]] . ")--;\n";
+                        $vars_to_increment_on_return[$scope[$instruction[1]]] = true;
                     } else {
                         $scope[$instruction[1]] = $this->printConstant($instruction);
                     }
                     break;
                 case 'free':
                     if (isset($scope[$instruction[1]]) && isset($vars[$scope[$instruction[1]]]) && $vars[$scope[$instruction[1]]] === "reckistring *") {
-                        //$code .= "recki_string_release(" . $scope[$instruction[1]] . ");\n";
+                        $code .= "recki_string_release(" . $scope[$instruction[1]] . ");\n";
                     }
                     break;
                 case '~':
@@ -197,16 +208,21 @@ class Function_
                     $prefix = $instruction[0];
                 case 'assign':
                     $v = $scope[$instruction[2]];
-                    if ($vars[$scope[$instruction[2]]] === "reckistring *") {
-                        $code .= "if ($v != NULL) {\n\trecki_string_release($v);\n}\n";
-                        $code .= $scope[$instruction[2]] . ' = recki_string_copy(' . $scope[$instruction[1]] . ");\n";
+                    $r = $scope[$instruction[1]];
+                    if ($vars[$v] === "reckistring *") {
+                        $code .= "if ($v != NULL && $v != $r) {\n\trecki_string_release($v);\n}\n";
+                        $code .= $v . ' = recki_string_copy(' . $scope[$instruction[1]] . ");\n";
                     } else {
-                        $code .= $scope[$instruction[2]] . ' = ' . $prefix . $scope[$instruction[1]] . ";\n";
+                        $code .= $v . ' = ' . $prefix . $scope[$instruction[1]] . ";\n";
                     }
                     break;
                 case 'return':
+                    $code .= $string_frees;
                     $code .= "*validReturn = SUCCESS;\n";
                     if (isset($instruction[1])) {
+                        if (isset($vars_to_increment_on_return[$scope[$instruction[1]]])) {
+                            $code .= "GC_REFCOUNT(" . $scope[$instruction[1]] . ")++;\n";
+                        }
                         $code .= 'return ' . $scope[$instruction[1]] . ";\n";
                     } else {
                         $code .= "return;\n";
@@ -265,14 +281,7 @@ class Function_
                     $v = $scope[$instruction[3]];
                     $l = $scope[$instruction[1]];
                     $r = $scope[$instruction[2]];
-                    $code .= "
-if ({$v} == NULL) {
-    {$v} = recki_string_alloc({$l}->len + {$r}->len, 0);
-}
-{$v} = recki_string_realloc({$v}, {$l}->len + {$r}->len, 0);
-memcpy({$v}->val, {$l}->val, {$l}->len);
-memcpy({$v}->val + {$l}->len, {$r}->val, {$r}->len);
-{$v}->val[{$v}->len] = '\\0';\n";
+                    $code .= "{$v} = recki_string_concat({$v}, {$l}, {$r});\n";
                     break;
                 default:
                     throw new \RuntimeException("Unsupported compiler operation {$instruction[0]}");
@@ -281,7 +290,14 @@ memcpy({$v}->val + {$l}->len, {$r}->val, {$r}->len);
         $code = $string_constants . $code;
         // Generate variable declarations
         foreach ($vars as $name => $type) {
-            $code = $type . ' ' . $name . ";\n" . $code;
+            if (isset($params[$name])) {
+                continue;
+            }
+            if ($type == "reckistring *") {
+                $code = $type . ' ' . $name . " = NULL;\n" . $code;
+            } else {
+                $code = $type . ' ' . $name . ";\n" . $code;
+            }
         }
         return preg_replace("(^(.))m", "\t$1", $code);
     }
@@ -322,10 +338,8 @@ memcpy({$v}->val + {$l}->len, {$r}->val, {$r}->len);
                 return (int) $const[3];
             case 'string':
                 $val = base64_decode($const[3]);
-                $val_encoded = preg_replace_callback("([^a-zA-Z0-9])", function($x) {
-                    return '\x' . str_pad(dechex(ord($x[0])), 2, '0', STR_PAD_LEFT);
-                }, $val);
-                return 'recki_string_init("' . $val_encoded . '", ' . strlen($val) . ', 0)';
+                $id = $this->module->getConstant($val);
+                return $this->module->getGlobal("string_constants") . "[{$id}]";
         }
         throw new \RuntimeException("Unknown constant type {$const[2]} with value {$const[3]}");
     }

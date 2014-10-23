@@ -41,7 +41,7 @@ class Compiler extends BaseCompiler
         $module = new Module($name);
 
         foreach ($functions as $name => $func) {
-            $obj = new Function_($name, $func);
+            $obj = new Function_($name, $func, $module);
             $module->addFunction($obj);
         }
         return $module->compile();
