@@ -62,6 +62,7 @@ class GeneratorTest extends TestCase
     {
         $generator = new Generator();
         $state = new \StdClass();
+        $state->constants = [];
         $state->scope = new \SplObjectStorage();
         $state->varidx = 0;
         $vertex = $this->getMock(Vertex::class);
@@ -94,11 +95,14 @@ class GeneratorTest extends TestCase
         list($out, $stub) = $generator->getVarStub($vertex, $state);
         $expected = <<<'EOF'
 var $1 long
-const $2 double 1.5
-const $3 string dGhpcyBpcyBhIHRlc3Q=
 
 EOF;
+        $constants = [
+            'const $2 double 1.5',
+            'const $3 string dGhpcyBpcyBhIHRlc3Q='
+        ];
         $this->assertEquals($expected, $stub);
+        $this->assertEquals($constants, $state->constants);
         $this->assertEquals(' $1 $2 $3 $1', $out);
 
     }
@@ -221,6 +225,7 @@ EOF;
 param $1 unknown
 param $2 unknown
 begin
+--constants--
 EOF;
         $this->assertEquals($expected, $generator->getTypedOutput($vertex, $state));
     }
@@ -359,8 +364,8 @@ function test123 double
 param $1 long
 param $2 double
 begin
-jumpz $1 @1
 const $3 double 1.5
+jumpz $1 @1
 return $3
 label @1
 return $2
@@ -396,8 +401,8 @@ function test123 double
 param $1 long
 param $2 double
 begin
-jumpz $1 @1
 const $3 double 1.5
+jumpz $1 @1
 return $3
 label @1
 return $2
