@@ -67,6 +67,10 @@ class Compiler extends BaseCompiler
         $this->context = new JitContext();
     }
 
+    public function convertToClass(\StdClass $instructions) {
+        throw new \BadMethodCallException("Not implemented");
+    }
+
     public function convertToCallable(array $instructions)
     {
         $func = $instructions[0];

@@ -327,6 +327,19 @@ class Type
         return $this->type === $type->type;
     }
 
+    public function isSatisfiedBy(Type $type)
+    {
+        if ($this->equals($type)) {
+            return true;
+        }
+        if ($this->type == Type::TYPE_NUMERIC && ($type->type == Type::TYPE_LONG || $type->type == Type::TYPE_DOUBLE)) {
+            return true;
+        }
+        if ($this->type == Type::TYPE_ZVAL) {
+            return true;
+        }
+    }
+
     /**
      * Get the associated subtype
      *

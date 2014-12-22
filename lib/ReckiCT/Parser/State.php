@@ -23,6 +23,7 @@ namespace ReckiCT\Parser;
 
 use ReckiCT\Graph\Vertex;
 use ReckiCT\Graph\Variable;
+use ReckiCT\Graph\ThisVariable;
 
 use Gliph\Graph\Digraph;
 
@@ -102,6 +103,9 @@ class State
         }
         if (!is_string($name)) {
             throw new \InvalidArgumentException("Expecting a string variable name, or an instance of Node\Expr\Variable");
+        }
+        if ($name == "this") {
+            return new ThisVariable;
         }
         if (!isset($this->scope[$name])) {
             $this->scope[$name] = new Variable($type);

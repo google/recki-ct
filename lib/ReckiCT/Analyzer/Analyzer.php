@@ -21,6 +21,7 @@
 
 namespace ReckiCT\Analyzer;
 
+use PhpParser\Node\Stmt\Class_ as AstClass;
 use PhpParser\Node\Stmt\Function_ as AstFunction;
 use PhpParser\Node;
 use PhpParser\NodeVisitor;
@@ -45,6 +46,11 @@ class Analyzer
     public function addProcessor(GraphProcessor $processor)
     {
         $this->graphProcessors[] = $processor;
+    }
+
+    public function analyzeClass(AstClass $class) {
+        list ($class) = $this->traverser->traverse([$class]);
+        return $class;
     }
 
     public function analyzeFunction(AstFunction $func)

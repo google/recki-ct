@@ -51,6 +51,44 @@ class Compiler extends BaseCompiler
 
     protected $compileCache = [];
 
+    public function convertToClass(\StdClass $class) {
+        $extends = $class->extends ? ' extends ' . $class->extends : '';
+        $implements = empty($class->implements) ? '' : ' implements ' . implode(', ', $class->implements);
+        $props = '';
+        $methods = '';
+        foreach ($class->properties as $prop) {
+            $props .= $prop[2];
+            if ($prop[3] == "static") {
+                $props .= " static";
+            }
+            $props .= ' $' . $prop[1];
+            if ($prop[5]) {
+                $props .= " = ";
+                if ($prop[4] == "string") {
+                    $props .= "'" . addcslashes(base64_decode($prop[5])) . "'";
+                } else {
+                    $props .= $prop[5];
+                }
+            }
+            $props .= ";\n";
+        }
+        foreach ($class->methods as $method) {
+            $modifiers = $method[0][1];
+            if ($method[0][2] == "static") {
+                $modifiers .= " static";
+            }
+            if ($method[0][3] == "final") {
+                $modifiers .= " final";
+            }
+            $method[0] = ["function", $method[0][4], $method[0][5]];
+            $code = $this->convertToCallable($method);
+            $methods .= $modifiers . ' ' .  $code . "\n";
+        }
+
+
+        return 'class ' . $class->name . $extends . $implements . " {\n" . $props . $methods . "\n}";
+    }
+
     public function convertToCallable(array $instructions)
     {
         $func = $instructions[0];
@@ -65,16 +103,18 @@ class Compiler extends BaseCompiler
             'function' => '',
             'instructions' => $instructions,
             'i' => $i,
-            'scope' => [],
+            'scope' => ['$this' => '$this'],
             'argNames' => $argNames,
             'labels' => [],
         ];
 
+        $args = [];
         while ('begin' != $instructions[$ctx->i][0]) {
+            $args[$instructions[$ctx->i][1]] = '$var' . (count($ctx->scope) + 1);
             $ctx->scope[$instructions[$ctx->i][1]] = '$var' . (count($ctx->scope) + 1);
             $ctx->i++;
         }
-        $argString = implode(', ', $ctx->scope);
+        $argString = implode(', ', $args);
 
         $count = count($ctx->instructions);
         while (++$ctx->i < $count) {
@@ -116,6 +156,10 @@ class Compiler extends BaseCompiler
             case 'assign':
                 $ctx->function .= $ctx->scope[$instruction[2]] . ' = ' . $ctx->scope[$instruction[1]] . ";\n";
 
+                return;
+            case 'propertyfetch':
+                $ctx->function .= $ctx->scope[$instruction[3]] . ' = ' . $ctx->scope[$instruction[2]] . '->' . $instruction[1] . ";\n";
+                
                 return;
             case 'label':
                 if (!isset($ctx->labels[$instruction[1]])) {

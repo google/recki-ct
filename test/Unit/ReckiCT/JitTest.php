@@ -44,7 +44,7 @@ class JitTest extends TestCase
      */
     public function testIntegration()
     {
-        $this->assertInstanceOf(JITFUFunc::class, Jit::JitFu(__NAMESPACE__ . '\\test'));
+        $this->assertInstanceOf(JITFUFunc::class, Jit::JitFu(__NAMESPACE__ . '\\test')[0]);
     }
 
     /**
@@ -59,7 +59,7 @@ class JitTest extends TestCase
      */
     public function testIntegration2()
     {
-        $this->assertInstanceOf(JITFUFunc::class, Jit::JitFu(__NAMESPACE__ . '\\test2'));
+        $this->assertInstanceOf(JITFUFunc::class, Jit::JitFu(__NAMESPACE__ . '\\test2')[0]);
     }
 
     /**
@@ -157,13 +157,13 @@ class JitTest extends TestCase
      */
     public function testCompileFunctionPHP()
     {
-        $ir = Jit::getInstance()->compileFunctionPHP(__NAMESPACE__ . '\\test');
+        $code = Jit::getInstance()->compileFunctionPHP(__NAMESPACE__ . '\\test');
         $expected = <<<'EOF'
-function ReckiCT\test($var1) {
-return $var1;
+function ReckiCT\test($var2) {
+return $var2;
 }
 EOF;
-        $this->assertEquals($expected, $ir);
+        $this->assertEquals([$expected], $code);
     }
 
     /**
@@ -199,7 +199,7 @@ function ReckiCT\test long
 param $1 long
 begin
 return $1
-end
+endfunction
 EOF;
         $this->assertEquals($expected, $ir);
     }
@@ -216,11 +216,11 @@ function ReckiCT\test long
 param $1 long
 begin
 return $1
-end
+endfunction
 EOF;
         $func = Jit::getInstance()->compileIrJitFu($ir, __NAMESPACE__ . '\\test');
 
-        $this->assertInstanceOf(JITFUFunc::class, $func);
+        $this->assertInstanceOf(JITFUFunc::class, $func[0]);
     }
 
     /**
@@ -236,7 +236,7 @@ function ReckiCT\test long
 param $1 long
 begin
 return $1
-end
+endfunction
 EOF;
         $jit = Jit::getInstance();
         $r = new \ReflectionProperty($jit, 'jitfucompiler');

@@ -369,7 +369,7 @@ jumpz $1 @1
 return $3
 label @1
 return $2
-end
+endfunction
 EOF;
         $this->assertEquals($expected, $generator->generateFunction('test123', $func));
     }
@@ -406,7 +406,7 @@ jumpz $1 @1
 return $3
 label @1
 return $2
-end
+endfunction
 EOF;
         $this->assertEquals($expected, $generator->generateFunction('test123', $func));
     }

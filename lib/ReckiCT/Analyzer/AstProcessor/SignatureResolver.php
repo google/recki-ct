@@ -25,6 +25,8 @@ namespace ReckiCT\Analyzer\AstProcessor;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Function_;
+use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Expr\FuncCall;
 
 use ReckiCT\Analyzer\SignatureResolver as Worker;
@@ -51,7 +53,7 @@ class SignatureResolver extends NodeVisitorAbstract
      */
     public function enterNode(Node $node)
     {
-        if ($node instanceof Function_) {
+        if ($node instanceof Function_ || $node instanceof ClassMethod) {
             $signature = $this->worker->resolve($node);
 
             $node->jitType = $signature->getReturn();
@@ -66,6 +68,8 @@ class SignatureResolver extends NodeVisitorAbstract
         } elseif ($node instanceof FuncCall) {
             $signature = $this->worker->resolve($node->name->toString());
             $node->signature = $signature;
+        } elseif ($node instanceof Property) {
+            $node->jitType = $this->worker->resolveVar($node->getDocComment());
         }
     }
 

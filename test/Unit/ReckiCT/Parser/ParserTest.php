@@ -26,25 +26,88 @@ use PHPUnit_Framework_TestCase as TestCase;
 
 use Gliph\Graph\DirectedAdjacencyList;
 
+use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Param;
 use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Stmt\Class_ as AstClass;
 use PhpParser\Node\Stmt\Return_ as AstReturn;
 use PhpParser\Node\Stmt\Function_ as AstFunction;
+use PhpParser\Node\Stmt\Property as AstProperty;
+use PhpParser\Node\Stmt\PropertyProperty as AstPropertyProperty;
 use PhpParser\Node\Expr\Variable as AstVariable;
 
 use ReckiCT\Type;
+use ReckiCT\Graph\Class_ as JitClass;
 use ReckiCT\Graph\Vertex\End as JitEnd;
 use ReckiCT\Graph\Vertex\NoOp as JitNoOp;
 use ReckiCT\Graph\Vertex\Return_ as JitReturn;
 use ReckiCT\Graph\Vertex\Function_ as JitFunction;
 use ReckiCT\Graph\Constant as JitConstant;
 use ReckiCT\Graph\Variable as JitVariable;
+use ReckiCT\Graph\Property as JitProperty;
 
 /**
  * @coversDefaultClass \ReckiCT\Parser\Parser
  */
 class ParserTest extends TestCase
 {
+
+    /**
+     * @covers ::parseClass
+     */
+    public function testParseEmptyClass() {
+        $parser = new Parser;
+        $node = new AstClass("Foo");
+        $node->namespacedName = new FullyQualified(["Foo"], []);
+        $class = $parser->parseClass($node);
+        $this->assertInstanceOf(JitClass::class, $class);
+        $this->assertEquals("Foo", $class->getName());
+        $this->assertNull($class->getExtends());
+        $this->assertEmpty($class->getMethods());
+        $this->assertEmpty($class->getProperties());
+    }
+
+    /**
+     * @covers ::parseClass
+     */
+    public function testParseClassWithProperties() {
+        $parser = new Parser;
+        $node = new AstClass("Foo", [
+                "stmts" => [
+                    $prop1 = new AstProperty(AstClass::MODIFIER_PUBLIC, [
+                        new AstPropertyProperty(
+                            "foo",
+                            null
+                        ),
+                    ]),
+                    $prop2 = new AstProperty(AstClass::MODIFIER_PROTECTED, [
+                        new AstPropertyProperty(
+                            "bar",
+                            new LNumber(12)
+                        ),
+                    ])
+                ],
+            ]);
+        $prop1->jitType = new Type(Type::TYPE_LONG);
+        $prop2->jitType = new Type(Type::TYPE_STRING);
+        $node->namespacedName = new FullyQualified(["Foo"], []);
+        $class = $parser->parseClass($node);
+        $this->assertInstanceOf(JitClass::class, $class);
+        $this->assertEquals("Foo", $class->getName());
+        $this->assertNull($class->getExtends());
+        $this->assertEmpty($class->getMethods());
+
+        $props = $class->getProperties();
+        $this->assertEquals(2, count($props), "Number of parsed properties is incorrect");
+        $this->assertInstanceOf(JitProperty::class, $props['foo']);
+        $this->assertInstanceOf(JitProperty::class, $props['bar']);
+        $this->assertSame($prop1->jitType, $props['foo']->getType());
+        $this->assertSame($prop2->jitType, $props['bar']->getType());
+        $this->assertNull($props['foo']->getDefault());
+        $this->assertInstanceof(JitConstant::class, $props['bar']->getDefault());
+        $this->assertEquals(12, $props['bar']->getDefault()->getValue());
+    }
+
     /**
      * @covers ::parseFunction
      * @covers ::addEndNode

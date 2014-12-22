@@ -33,7 +33,7 @@ class CompilerTest extends TestCase
 
     protected function setUp()
     {
-        $this->compiler = $this->getMock(Compiler::class, ['convertToCallable']);
+        $this->compiler = $this->getMock(Compiler::class, ['convertToCallable', 'convertToClass']);
     }
 
     /**
@@ -48,8 +48,11 @@ function test long
 begin
 a 1 2
 b 3 4
-end
+endfunction
 EOF;
+        $this->compiler->expects($this->never())
+            ->method('convertToClass');
+
         $this->compiler->expects($this->once())
             ->method('convertToCallable')
             ->with($this->equalTo([
@@ -59,7 +62,7 @@ EOF;
                 ['b', '3', '4'],
             ]))
             ->will($this->returnValue($ret = new \StdClass()));
-        $this->assertSame($ret, $this->compiler->compile($ir));
+        $this->assertSame([$ret], $this->compiler->compile($ir));
     }
 
     /**
@@ -73,12 +76,15 @@ EOF;
 function test long
 begin
 a 1 2
-end
+endfunction
 function test2 long
 begin
 a 5 6
-end
+endfunction
 EOF;
+        $this->compiler->expects($this->never())
+            ->method('convertToClass');
+
         $this->compiler->expects($this->exactly(2))
             ->method('convertToCallable')
             ->withConsecutive(
@@ -97,6 +103,6 @@ EOF;
                 $r1 = new \StdClass(),
                 $r2 = new \StdClass()
             ));
-        $this->assertSame(['test' => $r1, 'test2' => $r2], $this->compiler->compile($ir));
+        $this->assertSame([$r1, $r2], $this->compiler->compile($ir));
     }
 }

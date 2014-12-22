@@ -33,6 +33,10 @@ class Compiler extends BaseCompiler
         throw new \BadMethodCallException("Not implemented");
     }
 
+    public function convertToClass(\StdClass $instructions) {
+        throw new \BadMethodCallException("Not implemented");
+    }
+
     public function compile($ir, $name)
     {
         $instructions = $this->parseIr($ir);

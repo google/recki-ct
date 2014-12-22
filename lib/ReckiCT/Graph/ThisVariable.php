@@ -16,31 +16,19 @@
  *
  * @copyright 2014 Google Inc. All rights reserved
  * @license http://www.apache.org/licenses/LICENSE-2.0.txt Apache-2.0
- * @package Parser
+ * @package Graph
  */
 
-namespace ReckiCT\Parser;
+namespace ReckiCT\Graph;
 
-class Factory
+use ReckiCT\Type;
+
+class ThisVariable extends Variable
 {
-    public static function parser()
-    {
-        $parser = new Parser();
-        $parser->addRule(new Rules\Assign());
-        $parser->addRule(new Rules\BinaryOp());
-        $parser->addRule(new Rules\BooleanAnd());
-        $parser->addRule(new Rules\FunctionCall());
-        $parser->addRule(new Rules\Goto_());
-        $parser->addRule(new Rules\If_());
-        $parser->addRule(new Rules\Label());
-        $parser->addRule(new Rules\PreOp());
-        $parser->addRule(new Rules\PropertyFetch());
-        $parser->addRule(new Rules\PostOp());
-        $parser->addRule(new Rules\Return_());
-        $parser->addRule(new Rules\Ternary());
-        $parser->addRule(new Rules\UnaryOp());
 
-        return $parser;
+    public function __construct()
+    {
+        parent::__construct(new Type(Type::TYPE_USER, null, "this"));
     }
 
 }

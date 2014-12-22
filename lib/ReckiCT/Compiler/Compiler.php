@@ -26,19 +26,22 @@ abstract class Compiler
     public function compile($ir)
     {
         $instructions = $this->parseIr($ir);
-        $functions = $this->separateIrToFunctions($instructions);
-        $callables = array();
-        foreach ($functions as $name => $func) {
-            $callables[$name] = $this->convertToCallable($func);
+        $elements = $this->separateIr($instructions);
+        $results = array();
+        foreach ($elements['functions'] as $name => $func) {
+            $results[] = $this->convertToCallable($func);
         }
-        if (count($functions) === 1) {
-            return $callables[$name];
+        foreach ($elements['classes'] as $class) {
+            $results[] = $this->convertToClass($class);
         }
 
-        return $callables;
+
+        return $results;
     }
 
     abstract public function convertToCallable(array $instructions);
+
+    abstract public function convertToClass(\StdClass $instructions);
 
     protected function parseIr($ir)
     {
@@ -51,28 +54,78 @@ abstract class Compiler
         return $return;
     }
 
-    protected function separateIrToFunctions(array $instructions)
+    protected function separateIr(array $instructions)
     {
-        $functions = [
-            '' => [],
+        $elements = [
+            "classes" => [],
+            "functions" => [],
         ];
+        $mode = "";
         $currentFunction = '';
-        foreach ($instructions as $row) {
-            if ($row[0] === 'function') {
-                $currentFunction = $row[1];
-                $functions[$currentFunction] = [];
-            } elseif ($row[0] === 'end') {
-                $currentFunction = '';
-                continue;
-            }
-            $functions[$currentFunction][] = $row;
-        }
-        if (empty($functions[''])) {
-            // remove placeholder
-            unset($functions['']);
-        }
+        $currentClass = '';
+        $count = count($instructions);
+        for ($i = 0; $i < $count; $i++) {
+            $row = $instructions[$i];
 
-        return $functions;
+            switch ($row[0]) {
+                case 'function':
+                    $mode = "function";
+                    $currentFunction = $row[1];
+                    $elements['functions'][$currentFunction] = [];    
+                    break;
+                case 'endfunction':
+                    $currentFunction = '';
+                    $mode = '';
+                    continue 2;
+                case 'class':
+                    $mode = 'class';
+                    $currentClass = $row[1];
+                    $elements['classes'][$currentClass] = new \StdClass;
+                    $elements['classes'][$currentClass]->name = $row[1];
+                    $elements['classes'][$currentClass]->properties = [];
+                    $elements['classes'][$currentClass]->extends = null;
+                    $elements['classes'][$currentClass]->implements = [];
+                    $elements['classes'][$currentClass]->methods = [];
+                    break;
+                case 'endclass':
+                    $currentClass = '';
+                    $mode = '';
+                    continue 2;
+            }
+
+            if ($mode == "function") {
+                $elements['functions'][$currentFunction][] = $row;
+            } elseif ($mode == "class") {
+                switch ($row[0]) {
+                    case 'property':
+                        $elements['classes'][$currentClass]->properties[] = $row;
+                        break;        
+                    case 'extends':
+                        $elements['classes'][$currentClass]->extends = $row;
+                        break;
+                    case 'implements':
+                        $elements['classes'][$currentClass]->implements[] = $row;
+                        break;
+                    case 'method':
+                        $method = [];
+                        $name = $row[1];
+                        do {
+                            $method[] = $instructions[$i++];
+                        } while ($i < $count && $instructions[$i][0] != 'endmethod');
+                        $elements['classes'][$currentClass]->methods[$name] = $method;
+                        break;
+                }
+            }
+        }
+        if (empty($elements['functions'][''])) {
+            // remove placeholder
+            unset($elements['functions']['']);
+        }
+        if (empty($elements['classes'][''])) {
+            // remove placeholder
+            unset($elements['classes']['']);
+        }
+        return $elements;
     }
 
 }

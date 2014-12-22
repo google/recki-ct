@@ -27,6 +27,7 @@ use ReckiCT\Type;
 use phpDocumentor\Reflection\DocBlock;
 
 use PhpParser\Node\Stmt\Function_;
+use PhpParser\Node\Stmt\ClassMethod;
 
 use ReflectionFunction;
 
@@ -40,7 +41,7 @@ class SignatureResolver
 
     public function resolve($functionName)
     {
-        if ($functionName instanceof Function_) {
+        if ($functionName instanceof Function_ || $functionName instanceof ClassMethod) {
             return $this->resolveSignature((string) $functionName->getDocComment());
         } elseif (isset($this->internalMap[$functionName])) {
             $params = [];
@@ -79,6 +80,18 @@ class SignatureResolver
         }
 
         return new Signature($returnType, $paramTypes);
+    }
+
+    public function resolveVar($comment) {
+        if (!$comment) {
+            return new Type(Type::TYPE_UNKNOWN);
+        }
+        $docblock = new DocBlock((string) $comment);
+        $var = $docblock->getTagsByName("var");
+        if (count($var) !== 1) {
+            return new Type(Type::TYPE_UNKNOWN);
+        }
+        return Type::normalizeType($var[0]->getType());
     }
 
 }

@@ -21,11 +21,65 @@
 
 namespace ReckiCT\Intermediary;
 
+use ReckiCT\Graph\Class_;
 use ReckiCT\Graph\Constant;
 use ReckiCT\Graph\Vertex;
+use ReckiCT\Graph\ThisVariable;
 
 class Generator
 {
+    public function generateClass(Class_ $class)
+    {
+        $output = 'class ' . $class->getName() . "\n";
+        $parent = $class->getExtends();
+        if ($parent) {
+            $output .= "extends " . $parent->getName() . "\n";
+        }
+
+        foreach ($class->getImplements() as $interface) {
+            $output .= "implements " . $interface->getName();
+        }
+        foreach ($class->getProperties() as $prop) {
+            $output .= "property " . $prop->getName();
+            switch ($prop->getVisibility()) {
+                case Class_::VISIBILITY_PROTECTED:
+                    $output .= " protected";
+                    break;
+                case Class_::VISIBILITY_PRIVATE:
+                    $output .= " private";
+                    break;
+                default:
+                    $output .= " public";
+            }
+            $output .= $prop->isStatic() ? " static" : " not-static";
+            $output .= " " . $prop->getType();
+            $default = $prop->getDefault();
+            if ($default) {
+                $output .= " " . $this->makeValue($default);
+            }
+            $output .= "\n";
+        }
+        foreach ($class->getMethods() as $method) {
+            $func = $this->generateFunction($method->getName(), $method);
+            $modifiers = "";
+            switch ($prop->getVisibility()) {
+                case Class_::VISIBILITY_PROTECTED:
+                    $modifiers .= "protected";
+                    break;
+                case Class_::VISIBILITY_PRIVATE:
+                    $modifiers .= "private";
+                    break;
+                default:
+                    $modifiers .= "public";
+            }
+            $modifiers .= $method->isStatic() ? " static" : " not-static";
+            $modifiers .= $method->isFinal() ? " final" : " not-final";
+            $output .= str_replace(["function", "endfunction"], ["method $modifiers", "endmethod"], $func) . "\n";
+        }
+        $output .= "endclass";
+        return $output;
+    }
+
     public function generateFunction($name, Vertex\Function_ $func)
     {
         $state = (object) [
@@ -45,7 +99,7 @@ class Generator
         }
         $body = str_replace("--constants--\n", $replace, $body);
 
-        return 'function ' . $name . ' ' . $func->getReturnType() . "\n" . $body . "end";
+        return 'function ' . $name . ' ' . $func->getReturnType() . "\n" . $body . "endfunction";
     }
 
     public function generate(Vertex $vertex, \StdClass $state)
@@ -89,7 +143,9 @@ class Generator
         list ($vars, $varStub) = $this->getVarStub($vertex, $state);
 
         $output = strtolower($vertex->getName());
-        if ($vertex instanceof Vertex\BinaryOp) {
+        if ($vertex instanceof Vertex\PropertyFetch) {
+            $output .= ' ' . $vertex->getPropertyName();
+        } elseif ($vertex instanceof Vertex\BinaryOp) {
             $output = $vertex->getKind();
         } elseif ($vertex instanceof Vertex\BooleanNot) {
             $output = '!';
@@ -128,12 +184,14 @@ class Generator
         $varStub = '';
         foreach ($vertex->getVariables() as $var) {
             if (!isset($state->scope[$var])) {
+                if ($var instanceof ThisVariable) {
+                    $state->scope[$var] = 'this';
+                    $output .= ' $this';
+                    continue;
+                }
                 $state->scope[$var] = ++$state->varidx;
                 if ($var instanceof Constant) {
-                    $value = $var->getValue();
-                    if ('string' == (string) $var->getType()) {
-                        $value = base64_encode($value);
-                    }
+                    $value = $this->makeValue($var);
                     $state->constants[] = 'const $' . $state->scope[$var] . ' ' . $var->getType() . ' ' . $value;
                 } elseif ($vertex instanceof Vertex\Function_) {
                     $varStub .= 'param $' . $state->scope[$var] . ' ' . $var->getType() . "\n";
@@ -145,6 +203,13 @@ class Generator
         }
 
         return [$output, $varStub];
+    }
+
+    public function makeValue(Constant $const) {
+        if ('string' == (string) $const->getType()) {
+            return base64_encode($const->getValue());
+        }
+        return $const->getValue();
     }
 
     public function makeLabel(Vertex\NoOp $next, \StdClass $state)

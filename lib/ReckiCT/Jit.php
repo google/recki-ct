@@ -201,6 +201,7 @@ class Jit
         $file = $this->parseFile($r->getFilename());
         $node = $this->findClass($r->getName(), $file);
         if ($node) {
+            $node = $this->analyzer->analyzeClass($node);
             return $node;
         }
     }
@@ -259,8 +260,7 @@ class Jit
         if (!isset($this->parsedClassIr[$name])) {
             $ast = $this->getClassAst($name);
             $class = $this->parser->parseClass($ast);
-            $this->analyzer->analyzeClass($class);
-            $this->parsedClassIr[$name] = $this->generator->generateClass($name, $class);
+            $this->parsedClassIr[$name] = $this->generator->generateClass($class);
         }
         return $this->parsedClassIr[$name];
     }
